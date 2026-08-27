@@ -1,0 +1,288 @@
+/* ======================================================================
+   EMBER — DROP PAGE
+   ======================================================================
+   Scroll-driven turntable for a single drop. The shirt rotates on its Y
+   axis as the page scrolls; every half turn swaps the hidden face to the
+   next image, so one continuous spin walks through front and back of
+   every colourway.
+
+   Why CSS 3D and not WebGL: the visitor arrives from a paid Instagram
+   ad on a phone, often on mobile data. A .glb plus a three.js runtime is
+   megabytes before anything is drawn. This is two <img> elements and a
+   transform — it paints immediately and degrades to a still image when
+   the browser or the visitor says no to motion.
+
+   Colour follows the token rule: orange is interactive or price only.
+   The shirt, the labels and the rules are all the neutral ramp.
+   ====================================================================== */
+
+.drop {
+  background: var(--ember-surface);
+  color: var(--ember-ink);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+/* --- top bar ---------------------------------------------------------- */
+
+.drop-bar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px clamp(16px, 4vw, 40px);
+  pointer-events: none;
+}
+
+.drop-bar a,
+.drop-bar span {
+  pointer-events: auto;
+}
+
+.drop-bar__home {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--ember-tap-min);
+}
+
+.drop-bar__home img {
+  width: 40px;
+  height: auto;
+  display: block;
+}
+
+.drop-bar__meta {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ember-ink-dim);
+}
+
+/* --- the scroll track -------------------------------------------------
+   Height is set from JS off the number of faces, so adding a colourway
+   never means editing a magic number here. */
+
+.drop-track {
+  position: relative;
+}
+
+.drop-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: grid;
+  /* viewport / hint / caption. The hint is a grid row rather than an
+     absolutely positioned element because the caption's height moves with
+     the fluid display type — at 375px the two collided. */
+  grid-template-rows: 1fr auto auto;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* --- the shirt -------------------------------------------------------- */
+
+.drop-viewport {
+  perspective: 1400px;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  padding: 72px 16px 0;
+}
+
+.drop-shirt {
+  position: relative;
+  /* Every face is exported onto one 1100x1240 canvas, so the box can match
+     the art exactly and nothing letterboxes. The height cap divides by the
+     ratio — height is width x 1.127, so a 58svh height budget allows a
+     width of 58svh / 1.127. */
+  width: min(78vw, 58svh / 1.127, 560px);
+  aspect-ratio: 1100 / 1240;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.drop-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* A touch of contact shadow so the garment sits in the space rather
+     than floating as a cutout. */
+  filter: drop-shadow(0 24px 34px rgba(0, 0, 0, .55));
+}
+
+.drop-face--back {
+  transform: rotateY(180deg);
+}
+
+/* --- caption ---------------------------------------------------------- */
+
+.drop-caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 0 clamp(16px, 4vw, 40px) clamp(24px, 5vh, 48px);
+  border-top: 1px solid var(--ember-hairline);
+  margin-top: 20px;
+  padding-top: 18px;
+}
+
+.drop-colour {
+  font-family: "Anton", "Bebas Neue", Impact, sans-serif;
+  font-size: clamp(2rem, 1.2rem + 3.4vw, 4.5rem);
+  line-height: .95;
+  letter-spacing: .01em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.drop-side {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ember-ink-dim);
+}
+
+/* --- progress --------------------------------------------------------- */
+
+.drop-progress {
+  position: absolute;
+  left: clamp(16px, 4vw, 40px);
+  right: clamp(16px, 4vw, 40px);
+  bottom: 0;
+  height: 2px;
+  background: var(--ember-hairline);
+}
+
+.drop-progress__bar {
+  height: 100%;
+  width: 0%;
+  background: var(--ember-ink-dim);
+  transform-origin: left;
+}
+
+/* --- scroll hint ------------------------------------------------------ */
+
+.drop-hint {
+  margin: 0;
+  padding-bottom: 14px;
+  text-align: center;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--ember-ink-dim);
+  transition: opacity var(--ember-dur) var(--ember-ease);
+}
+
+.drop-hint[data-gone="true"] {
+  opacity: 0;
+}
+
+/* --- closing panel ---------------------------------------------------- */
+
+.drop-outro {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: clamp(40px, 10vh, 120px) clamp(16px, 4vw, 40px);
+  text-align: center;
+}
+
+.drop-outro__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  max-width: 46ch;
+}
+
+.drop-outro h2 {
+  font-family: "Anton", "Bebas Neue", Impact, sans-serif;
+  font-size: var(--ember-heading);
+  line-height: .95;
+  text-transform: uppercase;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.drop-outro p {
+  color: var(--ember-ink-muted);
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.drop-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--ember-tap-min);
+  padding: 14px 30px;
+  background: var(--ember-accent);
+  color: var(--ember-on-accent);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background var(--ember-dur-fast) var(--ember-ease);
+}
+
+.drop-cta:hover,
+.drop-cta:focus-visible {
+  background: var(--ember-accent-hover);
+}
+
+.drop-cta:focus-visible {
+  outline: none;
+  box-shadow: var(--ember-focus-ring);
+}
+
+.drop-swatches {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.drop-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--ember-hairline-strong);
+}
+
+/* ----------------------------------------------------------------------
+   No JS, or reduced motion
+   Both land in the same place: one still garment, full height, no track.
+   .drop-track keeps its scroll height only once JS has measured it, so
+   without JS there is nothing tall and nothing empty.
+   ---------------------------------------------------------------------- */
+
+.drop-track:not([data-ready="true"]) .drop-progress,
+.drop-track:not([data-ready="true"]) .drop-hint {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drop-shirt {
+    transform: none !important;
+  }
+
+  .drop-hint,
+  .drop-progress {
+    display: none;
+  }
+}

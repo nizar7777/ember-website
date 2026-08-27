@@ -1,0 +1,159 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_type": "mutation-plan",
+  "run_id": "setup-20260801-ember-meta",
+  "created_at": "2026-08-01T00:00:00Z",
+  "plan_id": "ember-ig-dm-boost-week1",
+  "platform": "meta",
+  "account_id": "act_2104778956966880",
+  "object_id": "planned-campaign-ember-ig-dm-boost-week1",
+  "operation": "create_campaign_adset_ad_from_existing_instagram_post",
+  "before": {
+    "state": "No such campaign exists. Nothing in the account is modified by this plan.",
+    "account_spend_to_date": "unknown - no API read available",
+    "note": "This is a create, not an edit. No existing campaign, ad set, ad, audience, or budget is touched."
+  },
+  "after": {
+    "campaign": {
+      "name": "Ember | IG DM | Amman | Week 1",
+      "objective": "Engagement",
+      "conversion_location": "Messaging apps",
+      "messaging_destination": "Instagram Direct",
+      "buying_type": "AUCTION",
+      "special_ad_categories": "None - apparel retail is not a restricted category",
+      "advantage_campaign_budget": "off - single ad set, budget set at ad set level"
+    },
+    "ad_set": {
+      "name": "Amman +30km | 18-34 | Broad",
+      "optimization_goal": "Conversations",
+      "bid_strategy": "Highest volume (no bid cap on week one - there is no cost history to set one from)",
+      "budget_type": "Lifetime",
+      "budget_usd": 42.0,
+      "budget_source": "30 JOD converted at the JOD/USD peg of about 1.41 USD per JOD",
+      "schedule_days": 7,
+      "geo": "Amman, Jordan + 30km radius",
+      "age": "18-34",
+      "gender": "All",
+      "detailed_targeting": "None - broad. At about 6 USD/day, interest stacking starves delivery and there is no performance history to justify any specific interest.",
+      "languages": "No restriction - Arabic and English both expected",
+      "placements": "Advantage+ (automatic), constrained by the source post format"
+    },
+    "ad": {
+      "creative_source": "Use existing post - the most recent Instagram post on the Ember account",
+      "why_existing_post": "Keeps the organic likes, comments and shares as social proof instead of starting a fresh ad at zero",
+      "call_to_action": "Send Message",
+      "destination": "Instagram Direct",
+      "primary_text": "Inherited from the existing post caption - not rewritten"
+    }
+  },
+  "reason": "Operator requested a one-week 30 JOD promotion of the latest Instagram post. Objective is Instagram Direct messaging because Ember's orders already arrive by DM and WhatsApp, there is no payment gateway to complete a purchase on site, and the pixel has zero conversion history so sales optimization cannot leave the learning phase at this budget.",
+  "blast_radius": "One new campaign containing one ad set and one ad, in ad account act_2104778956966880. No existing object is edited. Maximum financial exposure is the 42 USD lifetime budget, which Meta cannot exceed. No effect on any other campaign's learning phase because no other campaign exists to compete with. The organic post itself is not modified - promoting an existing post does not alter the original.",
+  "ceilings": [
+    {
+      "name": "lifetime_budget",
+      "value": 42.0,
+      "unit": "USD"
+    },
+    {
+      "name": "source_budget",
+      "value": 30.0,
+      "unit": "JOD"
+    },
+    {
+      "name": "max_run_duration",
+      "value": 7,
+      "unit": "days"
+    },
+    {
+      "name": "campaigns_created",
+      "value": 1,
+      "unit": "count"
+    },
+    {
+      "name": "ad_sets_created",
+      "value": 1,
+      "unit": "count"
+    },
+    {
+      "name": "ads_created",
+      "value": 1,
+      "unit": "count"
+    },
+    {
+      "name": "daily_spend_implied",
+      "value": 6.0,
+      "unit": "USD/day"
+    }
+  ],
+  "approval": null,
+  "idempotency_key": "ember-meta-ig-dm-week1-20260801-v1",
+  "audit_destination": ".claude-ads/runs/setup-20260801-ember-meta/mutation-audit.jsonl",
+  "verification_steps": [
+    "Before publishing: confirm the Instagram account is connected to business portfolio Ember Collection, otherwise Instagram Direct will not appear as a messaging destination.",
+    "Before publishing: confirm the budget field reads 42 USD and not 30. The account bills in USD; entering 30 would underspend the intended 30 JOD by about 29 percent.",
+    "Before publishing: confirm the end date is exactly 7 days after the start date.",
+    "Before publishing: confirm the selected post is the intended latest Instagram post and that it is eligible for promotion.",
+    "Within 24 hours of publishing: confirm status is Active and not In Review or Rejected, and that spend has begun.",
+    "Within 24 hours: confirm the 'verification may be required soon' account advisory has not escalated into a delivery block.",
+    "Day 3: check cost per conversation and frequency. Frequency above roughly 3 on a 7-day run in a single city audience indicates the audience is being over-exposed.",
+    "Day 7: record total spend, conversations started, and how many conversations became real orders. That manual tally is the only link between the ad and revenue, because Instagram Direct conversations never touch the website pixel."
+  ],
+  "rollback": {
+    "operation": "Pause the campaign in Ads Manager. If it should never have run, pause first and then archive - do not delete.",
+    "expected_state": {
+      "campaign_status": "PAUSED",
+      "further_spend": "none",
+      "spend_already_incurred": "not recoverable - pausing stops future delivery only",
+      "organic_post": "unaffected - the original Instagram post and its engagement remain intact"
+    },
+    "verification": [
+      "Campaign status reads Paused in Ads Manager.",
+      "Spend stops increasing on the next reporting refresh.",
+      "The original Instagram post is still live with its organic engagement intact."
+    ]
+  },
+  "remote_precondition_sha256": "1a5085bff005ff82a1a33fa2527567765fae593b1628e6c11bf8390f7eab6122",
+  "status": "draft",
+  "data_lifecycle": {
+    "schema_version": "1.0.0",
+    "lifecycle_id": "lc-setup-20260801-ember-meta",
+    "classification": "public",
+    "retention": {
+      "minimum_seconds": 7776000,
+      "mode": "operator-defined",
+      "delete_after": "2026-10-30T00:00:00Z",
+      "purpose": "Hold the Ember paid-media setup profile long enough to stand up Meta measurement, build the first campaign, and complete one optimization cycle; the profile has no purpose beyond that window and is re-created rather than extended.",
+      "exception_reason": null
+    },
+    "encryption": {
+      "at_rest": "not-applicable",
+      "in_transit": "not-applicable",
+      "evidence_refs": [
+        "Classification is 'public' by scope, not by accident. This run directory is deliberately limited to facts already published on ember-jo.netlify.app, structural observations about the site, and non-numeric operator decisions. No encryption control is required for that data class.",
+        "Deliberately held OUTSIDE this artifact: the paid-media budget figure, and any future target CPA, ROAS, or margin numbers. Those live in operator conversation only.",
+        "Observed 2026-08-01: this workstation has no full-disk encryption. Get-BitLockerVolume (elevated) reported C: and E: as FullyDecrypted / ProtectionStatus Off / EncryptionMethod None. D: is a fixed 856 GB NTFS volume and is BitLocker-eligible but was not shown as encrypted.",
+        "Escalation rule: the moment a credential, customer list, audience file, account export, or any commercially sensitive number needs to be stored here, this classification is void. Re-classify to confidential or restricted and obtain verified at-rest encryption first."
+      ]
+    },
+    "access": {
+      "owner": "nezar (project operator, Ember website build)",
+      "authorized_roles": [
+        "project-operator",
+        "ember-business-owner"
+      ],
+      "access_log_locator": null
+    },
+    "deletion": {
+      "status": "scheduled",
+      "method": "Recursive delete of .claude-ads/runs/setup-20260801-ember-meta/ from the local workstation, including any rendered Markdown, HTML, or PDF copies produced from it, followed by a directory-absence check.",
+      "verification_required": true,
+      "verification_artifact_locator": ".claude-ads/runs/setup-20260801-ember-meta/deletion-verification.json"
+    },
+    "incident": {
+      "owner": "nezar (project operator, Ember website build)",
+      "reporting_channel": "Private direct message to the Ember business owner on the existing WhatsApp thread used for project delivery; contact details are held outside this repository.",
+      "status": "not-triggered",
+      "record_locator": null
+    }
+  }
+}

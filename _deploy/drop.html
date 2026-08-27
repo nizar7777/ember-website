@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>The Drop — Ember</title>
+  <meta content="Seven colourways, front and back. Scroll to turn." name="description">
+  <meta content="The Drop — Ember" property="og:title">
+  <meta content="Seven colourways, front and back. Scroll to turn." property="og:description">
+  <meta content="https://ember-jo.netlify.app/images/og-ember.jpg" property="og:image">
+  <meta property="og:type" content="website">
+  <meta content="summary_large_image" name="twitter:card">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <!-- Meta Pixel — see js/meta-pixel.js -->
+  <script src="js/meta-pixel.js"></script>
+  <link href="css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="css/webflow.css" rel="stylesheet" type="text/css">
+  <link href="css/ember-c38e0b.webflow.css" rel="stylesheet" type="text/css">
+  <link href="css/tokens.css" rel="stylesheet" type="text/css">
+  <link href="css/drop.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link href="images/favicon.png" rel="icon" type="image/png" sizes="32x32" media="(prefers-color-scheme: light)">
+  <link href="images/favicon-dark.png" rel="icon" type="image/png" sizes="32x32" media="(prefers-color-scheme: dark)">
+  <link href="images/webclip.png" rel="apple-touch-icon">
+  <!-- The first face is the one thing that must not pop in. -->
+  <link rel="preload" as="image" href="images/drop/black-front.webp">
+  <link href="css/system.css" rel="stylesheet" type="text/css">
+</head>
+<body class="drop">
+
+  <div class="drop-bar">
+    <a href="index.html" class="drop-bar__home" aria-label="Ember home">
+      <img src="images/Artboard-12_1.svg" alt="" width="40">
+    </a>
+    <span class="drop-bar__meta">7 colourways</span>
+  </div>
+
+  <!-- The track's height is set by JS from the number of faces. Without
+       JS it collapses to the stage height and the page still reads. -->
+  <section class="drop-track" data-drop-track>
+    <div class="drop-stage">
+
+      <div class="drop-viewport">
+        <div class="drop-shirt" data-drop-shirt>
+          <img class="drop-face" data-drop-face="a" src="images/drop/black-front.webp" alt="Ember tee, Black, front" width="1100" height="1240" decoding="async">
+          <img class="drop-face drop-face--back" data-drop-face="b" src="images/drop/black-back.webp" alt="" width="1100" height="1240" decoding="async" aria-hidden="true">
+        </div>
+      </div>
+
+      <p class="drop-hint" data-drop-hint>Scroll to turn</p>
+
+      <div class="drop-caption">
+        <h1 class="drop-colour" data-drop-colour>Black</h1>
+        <span class="drop-side" data-drop-side>Front</span>
+      </div>
+
+      <div class="drop-progress" role="presentation">
+        <div class="drop-progress__bar" data-drop-bar></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="drop-outro">
+    <div class="drop-outro__inner">
+      <h2>Every colour, front and back</h2>
+      <p>Printed and finished in Amman. Sizes S through XL, restocked every two weeks.</p>
+      <div class="drop-swatches" data-drop-swatches aria-hidden="true"></div>
+      <a class="drop-cta" href="store.html">Shop the drop</a>
+    </div>
+  </section>
+
+  <script src="js/drop.js"></script>
+</body>
+</html>

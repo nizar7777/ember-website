@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "setup-20260801-ember-meta",
+  "started_at": "2026-08-01T00:00:00Z",
+  "scopes": [
+    "setup",
+    "meta"
+  ],
+  "adapters": [
+    {
+      "platform": "meta",
+      "mode": "export"
+    }
+  ],
+  "sources": [
+    "operator-intake-2026-08-01",
+    "repository-scan:ember-c38e0b.webflow",
+    "repository-file:SETUP-NEEDED.txt",
+    "repository-file:index.html",
+    "repository-file:sitemap.xml",
+    "repository-file:robots.txt",
+    "tag-scan:no-pixel-no-analytics-found"
+  ],
+  "privacy_class": "public",
+  "data_lifecycle": {
+    "schema_version": "1.0.0",
+    "lifecycle_id": "lc-setup-20260801-ember-meta",
+    "classification": "public",
+    "retention": {
+      "minimum_seconds": 7776000,
+      "mode": "operator-defined",
+      "delete_after": "2026-10-30T00:00:00Z",
+      "purpose": "Hold the Ember paid-media setup profile long enough to stand up Meta measurement, build the first campaign, and complete one optimization cycle; the profile has no purpose beyond that window and is re-created rather than extended.",
+      "exception_reason": null
+    },
+    "encryption": {
+      "at_rest": "not-applicable",
+      "in_transit": "not-applicable",
+      "evidence_refs": [
+        "Classification is 'public' by scope, not by accident. This run directory is deliberately limited to facts already published on ember-jo.netlify.app, structural observations about the site, and non-numeric operator decisions. No encryption control is required for that data class.",
+        "Deliberately held OUTSIDE this artifact: the paid-media budget figure, and any future target CPA, ROAS, or margin numbers. Those live in operator conversation only.",
+        "Observed 2026-08-01: this workstation has no full-disk encryption. Get-BitLockerVolume (elevated) reported C: and E: as FullyDecrypted / ProtectionStatus Off / EncryptionMethod None. D: is a fixed 856 GB NTFS volume and is BitLocker-eligible but was not shown as encrypted.",
+        "Escalation rule: the moment a credential, customer list, audience file, account export, or any commercially sensitive number needs to be stored here, this classification is void. Re-classify to confidential or restricted and obtain verified at-rest encryption first."
+      ]
+    },
+    "access": {
+      "owner": "nezar (project operator, Ember website build)",
+      "authorized_roles": [
+        "project-operator",
+        "ember-business-owner"
+      ],
+      "access_log_locator": null
+    },
+    "deletion": {
+      "status": "scheduled",
+      "method": "Recursive delete of .claude-ads/runs/setup-20260801-ember-meta/ from the local workstation, including any rendered Markdown, HTML, or PDF copies produced from it, followed by a directory-absence check.",
+      "verification_required": true,
+      "verification_artifact_locator": ".claude-ads/runs/setup-20260801-ember-meta/deletion-verification.json"
+    },
+    "incident": {
+      "owner": "nezar (project operator, Ember website build)",
+      "reporting_channel": "Private direct message to the Ember business owner on the existing WhatsApp thread used for project delivery; contact details are held outside this repository.",
+      "status": "not-triggered",
+      "record_locator": null
+    }
+  },
+  "worker_status": {
+    "conductor-setup-intake": "completed"
+  },
+  "completeness": "partial"
+}

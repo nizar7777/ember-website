@@ -1,0 +1,543 @@
+/* ======================================================================
+   EMBER — RETAIL PARTNER PAGE (Arabic, RTL)
+   ======================================================================
+   A landing page sent to a named shop owner after a call. Not cold ad
+   traffic, which is why the 3D stand is allowed here and argued against
+   in drop.css: the visitor is already warm, no ad budget is burning
+   while it loads, and the stand is the physical object we are asking
+   them to put on their floor. It lazy-loads well below the fold.
+
+   Everything here builds on tokens.css. Surfaces, ink ramp, accent,
+   easing, durations, tap floor and focus ring are all inherited — only
+   the things tokens.css has no opinion about are defined below.
+
+   THE COLOUR RULE still holds: orange is interactive or price, nothing
+   else. The shmagh weave motif and the 3D stand are drawn in the
+   neutral ink ramp for exactly that reason.
+
+   TWO DELIBERATE ARABIC DEVIATIONS
+   1. Eyebrows drop the Mono letter-spacing. letter-spacing severs the
+      cursive joins that Arabic depends on, so tracking is applied to
+      Latin strings only.
+   2. The display scale is re-interpolated. --ember-heading tops out at
+      6rem, which is tuned for Anton's condensed uppercase Latin; Arabic
+      at that size overpowers the column and its descenders collide.
+   ====================================================================== */
+
+:root {
+  /* Arabic display scale — 30px at 375, 68px at 1440. Lower ceiling than
+     --ember-heading for the reason above. */
+  --ar-display: clamp(1.875rem, 1.06rem + 3.48vw, 4.25rem);
+  --ar-heading: clamp(1.5rem, 1.16rem + 1.45vw, 2.5rem);
+  --ar-lead: clamp(1.0625rem, 1.0rem + .27vw, 1.25rem);
+
+  --ar-font: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --ar-display-font: "Changa", "IBM Plex Sans Arabic", sans-serif;
+  --lat-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+.partners {
+  background: var(--ember-surface);
+  color: var(--ember-ink);
+  font-family: var(--ar-font);
+  direction: rtl;
+  text-align: right;
+  line-height: 1.8;
+  margin: 0;
+  /* The Webflow base sets overflow-x:hidden on body. That resolves
+     overflow-y to auto, which turns body into a scroll container and
+     silently kills position:sticky for every descendant — the stand
+     stage scrolled away instead of pinning. `clip` gives the same
+     horizontal containment without creating a scroll container. */
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+.partners *,
+.partners *::before,
+.partners *::after { box-sizing: border-box; }
+
+/* Latin runs inside Arabic text need isolating or the bidi algorithm
+   reorders punctuation around them. */
+.ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
+.num {
+  font-family: var(--lat-mono);
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-variant-numeric: tabular-nums;
+}
+
+.wrap {
+  width: min(100% - 2 * clamp(16px, 5vw, 48px), 1080px);
+  margin-inline: auto;
+}
+
+/* --- skip link (system.css defines the pattern; this is the RTL twin) - */
+.p-skip {
+  position: absolute;
+  right: 12px;
+  top: -60px;
+  z-index: 100;
+  background: var(--ember-ink);
+  color: var(--ember-surface);
+  padding: 12px 18px;
+  border-radius: 3px;
+  text-decoration: none;
+  transition: top var(--ember-dur-fast) var(--ember-ease);
+}
+.p-skip:focus { top: 12px; }
+
+/* --- home link --------------------------------------------------------
+   The page had no way back to the site at all. Fixed rather than in flow
+   so it survives the hero, and above the canvas so the parts pass behind
+   it. RTL, so it pins to the right. */
+.p-home {
+  position: fixed;
+  inset-block-start: clamp(14px, 2.4vw, 26px);
+  inset-inline-start: clamp(14px, 4vw, 40px);
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--ember-tap-min);
+  min-height: var(--ember-tap-min);
+  opacity: .82;
+  transition: opacity var(--ember-dur-fast) var(--ember-ease);
+}
+.p-home:hover { opacity: 1; }
+.p-home:focus-visible { outline: none; box-shadow: var(--ember-focus-ring); border-radius: 3px; }
+.p-home img { display: block; width: 38px; height: auto; }
+
+/* --- eyebrow ---------------------------------------------------------- */
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ember-ink-dim);
+  margin: 0;
+  /* NO letter-spacing — see header note */
+}
+.eyebrow .ltr { letter-spacing: .16em; font-family: var(--lat-mono); font-size: 10px; text-transform: uppercase; }
+
+/* --- section rhythm --------------------------------------------------- */
+.p-section { padding-block: clamp(56px, 9vw, 116px); }
+.p-section--band { background: var(--ember-surface-raised); }
+
+.p-section--cream {
+  background: var(--_color---cream, #f2e9db);
+  color: #171310;
+}
+.p-section--cream .eyebrow { color: #6a5f52; }
+.p-section--cream .p-h2 { color: #171310; }
+.p-section--cream .p-lead { color: #3d362e; }
+/* On cream the standard accent fails contrast; tokens.css provides the
+   deeper one for exactly this band. */
+.p-section--cream a { color: var(--ember-accent-on-light); }
+
+.p-h2 {
+  font-family: var(--ar-display-font);
+  font-size: var(--ar-heading);
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 10px 0 0;
+  text-wrap: balance;
+  /* The Webflow base gives headings a dark ink meant for light sections.
+     On this dark ground that measured 1.07:1 — invisible. Declared
+     explicitly; the --cream rule below still overrides by specificity. */
+  color: var(--ember-ink);
+}
+
+.p-lead {
+  font-size: var(--ar-lead);
+  color: var(--ember-ink-muted);
+  margin: 14px 0 0;
+  max-width: 60ch;
+}
+
+/* --- hero ------------------------------------------------------------- */
+.p-hero {
+  position: relative;
+  padding-block: clamp(72px, 13vw, 152px) clamp(40px, 7vw, 80px);
+  overflow: hidden;
+}
+
+.p-hero h1 {
+  font-family: var(--ar-display-font);
+  font-size: var(--ar-display);
+  font-weight: 700;
+  line-height: 1.28;
+  margin: 12px 0 0;
+  text-wrap: balance;
+  max-width: 18ch;
+  /* same inherited-dark problem as .p-h2; it landed on the muted ink,
+     which reads but is soft for the one line that has to carry the page */
+  color: var(--ember-ink);
+}
+
+.p-hero .p-lead { max-width: 52ch; font-size: clamp(1.0625rem, 1rem + .4vw, 1.35rem); }
+
+/* shmagh weave — neutral ink ramp only, never the accent */
+.p-weave {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: min(46%, 460px);
+  aspect-ratio: 1;
+  opacity: .07;
+  pointer-events: none;
+  color: var(--ember-ink);
+}
+
+/* --- the three numbers ------------------------------------------------ */
+.p-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: clamp(18px, 3vw, 40px);
+  margin-top: clamp(32px, 5vw, 56px);
+  padding-top: 26px;
+  border-top: 1px solid var(--ember-hairline-strong);
+}
+.p-fig__n {
+  font-family: var(--ar-display-font);
+  font-size: clamp(2.4rem, 1.4rem + 4.2vw, 4rem);
+  font-weight: 700;
+  line-height: 1;
+  display: block;
+}
+.p-fig__l {
+  color: var(--ember-ink-dim);
+  font-size: .92rem;
+  margin: 6px 0 0;
+}
+
+/* --- offer / risk reversal ------------------------------------------- */
+.p-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-top: clamp(28px, 4vw, 44px);
+}
+.p-card {
+  background: var(--ember-surface-raised);
+  border: 1px solid var(--ember-hairline);
+  border-radius: 4px;
+  padding: 22px 24px;
+}
+.p-section--band .p-card { background: var(--ember-surface); }
+.p-card h3 {
+  font-family: var(--ar-display-font);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.p-card p { margin: 0; color: var(--ember-ink-muted); }
+
+.p-zero {
+  margin-top: clamp(28px, 4vw, 44px);
+  border-inline-start: 3px solid var(--ember-accent);
+  background: var(--ember-surface-raised);
+  padding: 24px 26px;
+  border-radius: 4px;
+}
+.p-zero strong { color: var(--ember-ink); }
+
+/* --- 3D stand ---------------------------------------------------------
+   The canvas is fixed to the viewport and sits BEHIND the page content,
+   so the parts are scattered across the reader's whole first run down the
+   page and converge as they scroll. It is not a section you stop and
+   watch — the assembly is the act of reading.
+
+   Because it sits at z-index 0, any section with an opaque background
+   would hide it. Everything from the hero down to the stand therefore
+   stays transparent (.p-section--clear), and the banded fills only resume
+   afterwards, once the canvas has faded out. */
+#stand-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 700ms var(--ember-ease);
+  /* the stand is geometry, not a control — neutral ramp */
+  color: var(--ember-ink);
+}
+
+/* Content sits above the canvas WITHOUT any blanket positioning rule.
+   The first attempt was `.partners > * { position: relative; z-index: 1 }`
+   and it quietly broke three things at equal specificity: the skip link
+   lost position:absolute and became visible at the top of the page, the
+   home link lost position:fixed and scrolled away, and <main> became the
+   stand section's offsetParent so offsetTop stopped being document
+   relative.
+
+   Instead the canvas goes behind everything at z-index -1, and the page
+   ground moves to <html> so the body no longer paints over it. Content
+   needs no positioning at all, and every element keeps the position it
+   declared for itself. */
+html { background: var(--ember-surface); }
+.partners { background: transparent; }
+
+/* The run the parts travel through: no fills, hairlines instead. */
+.p-section--clear { background: transparent; }
+.p-section--clear + .p-section--clear { border-top: 1px solid var(--ember-hairline); }
+
+/* No sticky stage any more. The section reserves the last stretch of the
+   assembly and holds the caption at its foot, so the object completes
+   just as the reader arrives at the words describing it. */
+.p-stand {
+  position: relative;
+  /* Tall enough that once the parts land there is a full viewport of clear
+     ground for the assembled stand to stand alone in. At 165svh with the
+     caption pinned to the foot, the opaque specs band had already scrolled
+     up over the stand by the time the words arrived. */
+  min-height: 190svh;
+  display: grid;
+  align-content: center;
+  padding-block: 0;
+}
+/* The caption sits over the assembled stand, and the stand is drawn in the
+   same cream as the copy — a rail passing behind a line collapsed its
+   contrast. Blurring and darkening what is behind the text keeps the stand
+   present but out of focus, so the words always win. */
+.p-stand__cap {
+  position: relative;
+  border-top: 1px solid var(--ember-hairline);
+  padding: 18px clamp(14px, 4vw, 28px) 22px;
+  border-radius: 3px;
+  backdrop-filter: blur(8px) brightness(.5);
+  -webkit-backdrop-filter: blur(8px) brightness(.5);
+}
+
+/* No backdrop-filter (older Firefox, some Android WebViews): fall back to a
+   solid-enough tint rather than leaving the text over bare geometry. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .p-stand__cap { background: color-mix(in srgb, var(--ember-surface) 88%, transparent); }
+}
+.p-stand__fallback {
+  display: grid;
+  place-items: center;
+  min-height: 46svh;
+  color: var(--ember-ink-dim);
+  border: 1px dashed var(--ember-hairline-strong);
+  border-radius: 4px;
+  padding: 32px;
+  text-align: center;
+}
+
+/* --- specs ------------------------------------------------------------ */
+.p-specs {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: clamp(24px, 4vw, 40px);
+}
+.p-specs th,
+.p-specs td {
+  text-align: right;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--ember-hairline);
+  vertical-align: top;
+}
+.p-specs th {
+  color: var(--ember-ink-dim);
+  font-weight: 500;
+  width: 42%;
+  font-size: .95rem;
+}
+.p-specs td { font-weight: 500; }
+.p-specs tr:last-child th,
+.p-specs tr:last-child td { border-bottom: 0; }
+
+/* --- photo slots ------------------------------------------------------ */
+.p-shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: clamp(24px, 4vw, 40px);
+}
+.p-shot {
+  aspect-ratio: 4 / 5;
+  background: var(--ember-surface-raised);
+  border: 1px dashed var(--ember-hairline-strong);
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  color: var(--ember-ink-dim);
+  font-size: .9rem;
+  text-align: center;
+  padding: 20px;
+}
+.p-shot--wide {
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 9;
+  border-color: var(--ember-accent);
+  color: var(--ember-ink-muted);
+}
+.p-shot img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+
+/* --- categories ------------------------------------------------------- */
+.p-cats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: clamp(24px, 4vw, 40px);
+  counter-reset: cat;
+}
+.p-cat {
+  background: var(--ember-surface-raised);
+  border: 1px solid var(--ember-hairline);
+  border-radius: 4px;
+  padding: 24px;
+}
+.p-section--band .p-cat { background: var(--ember-surface); }
+.p-cat h3 {
+  font-family: var(--ar-display-font);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+.p-cat p { margin: 0; color: var(--ember-ink-muted); }
+
+/* --- brand story ------------------------------------------------------ */
+.p-thesis {
+  font-family: var(--ar-display-font);
+  font-size: clamp(1.35rem, 1rem + 1.5vw, 2.15rem);
+  font-weight: 700;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 22ch;
+  text-wrap: balance;
+  /* Was inheriting the accent. The colour rule reserves orange for
+     interactive and price; a thesis line is neither. */
+  color: var(--ember-ink);
+}
+.p-wahsh {
+  margin-top: clamp(26px, 4vw, 42px);
+  background: var(--ember-surface-raised);
+  border: 1px solid var(--ember-hairline);
+  border-radius: 4px;
+  padding: 26px 28px;
+}
+/* Originally sized for the single word وحش. It now carries the design
+   rule as a full sentence, so it takes a heading size rather than a
+   display one — at the old 6rem ceiling it ran to three lines and
+   swamped the section. */
+.p-wahsh__word {
+  font-family: var(--ar-display-font);
+  font-size: clamp(1.45rem, 1.1rem + 1.6vw, 2.3rem);
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 12px;
+  color: var(--ember-ink);
+  text-wrap: balance;
+  max-width: 24ch;
+}
+
+/* --- steps ------------------------------------------------------------ */
+.p-steps {
+  list-style: none;
+  margin: clamp(24px, 4vw, 40px) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+  background: var(--ember-hairline);
+  border: 1px solid var(--ember-hairline);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.p-step {
+  background: var(--ember-surface);
+  padding: 20px 24px;
+  display: flex;
+  gap: 18px;
+  align-items: baseline;
+}
+.p-section--band .p-step { background: var(--ember-surface-raised); }
+.p-step__n {
+  font-family: var(--lat-mono);
+  font-size: 12px;
+  color: var(--ember-ink-dim);
+  flex: none;
+  padding-top: 4px;
+}
+.p-step h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 4px; }
+.p-step p { margin: 0; color: var(--ember-ink-muted); font-size: .96rem; }
+
+/* --- contact / CTA ---------------------------------------------------- */
+.p-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: clamp(24px, 4vw, 40px);
+}
+.p-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--ember-tap-min);
+  padding: 14px 26px;
+  border-radius: 3px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background var(--ember-dur-fast) var(--ember-ease),
+              border-color var(--ember-dur-fast) var(--ember-ease);
+}
+.p-btn--primary {
+  background: var(--ember-accent);
+  color: var(--ember-on-accent);
+}
+.p-btn--primary:hover { background: var(--ember-accent-hover); }
+.p-btn--ghost {
+  border: 1px solid var(--ember-hairline-strong);
+  color: var(--ember-ink);
+}
+.p-btn--ghost:hover { border-color: var(--ember-ink); }
+.p-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ember-focus-ring);
+}
+
+.p-phone {
+  margin: 16px 0 0;
+  color: var(--ember-ink-dim);
+  font-size: 1.05rem;
+  letter-spacing: .04em;
+}
+
+.p-todo {
+  background: #3a2a10;
+  color: #f0d79a;
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-family: var(--lat-mono);
+  font-size: .8em;
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
+.p-foot {
+  padding-block: 40px;
+  border-top: 1px solid var(--ember-hairline);
+  font-size: .88rem;
+}
+
+/* Third element inheriting a colour from the Webflow base that assumes a
+   light ground — h2 came out near-black, the thesis and this came out
+   accent-orange. Declared on the child, since setting it on .p-foot alone
+   loses to whatever the base targets the <p> with. */
+.p-foot p { color: var(--ember-ink-dim); margin: 0; }
+
+::selection { background: var(--ember-accent); color: var(--ember-on-accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  #stand-canvas { display: none; }
+}

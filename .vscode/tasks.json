@@ -1,0 +1,41 @@
+{
+  // Starts the local web server that serve.ps1 provides.
+  // "Run and Debug" launches this automatically before opening Chrome —
+  // see .vscode/launch.json.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Serve Ember site",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", "${workspaceFolder}/serve.ps1",
+        "-Port", "5500"
+      ],
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        // serve.ps1 prints "Serving ... on http://localhost:5500/" once it's
+        // listening; that line is what tells VS Code the task is ready.
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "Serving .* on http://localhost:.*"
+        }
+      },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated"
+      }
+    }
+  ]
+}
