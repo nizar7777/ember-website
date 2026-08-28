@@ -1,6 +1,7 @@
 @font-face {
   font-family: Humane;
-  src: url('../fonts/Humane-Regular.ttf') format("truetype");
+  src: url('../fonts/Humane-Regular.woff2') format('woff2'),
+       url('../fonts/Humane-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -4666,7 +4667,8 @@ p {
 
 @font-face {
   font-family: 'Humane';
-  src: url('../fonts/Humane-Regular.ttf') format('truetype');
+  src: url('../fonts/Humane-Regular.woff2') format('woff2'),
+       url('../fonts/Humane-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
