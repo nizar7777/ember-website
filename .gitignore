@@ -1,0 +1,25 @@
+# Working files that must never reach a PUBLIC repo.
+#
+# Added 27 Aug 2026 after finding these already published at
+# github.com/nizar7777/ember-website (a public repo). Untracking them here
+# stops future commits carrying them; it does NOT remove them from history
+# already on GitHub — see the notes handed to the operator.
+
+# Ad account IDs, campaign plans, budget notes
+.claude-ads/
+
+# Agent/editor config
+.claude/
+.vscode/
+
+# Operational notes: EmailJS service + template IDs, contact routing
+SETUP-NEEDED.txt
+
+# Internal order-logging tool. Deliberately excluded from the deploy build;
+# the Jekyll Pages workflow serves the repo root, so tracking it here would
+# put it on a live URL anyway.
+order-entry.html
+
+# Local-only tooling
+serve.ps1
+tools/

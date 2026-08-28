@@ -61,9 +61,20 @@
   //
   // `type` is what this tab sells, and it becomes the SUB-filter (see
   // toProduct). The whole tab is one type, so it doesn't need a column.
+  // `category` FORCES the top-level filter value for every row on that tab,
+  // instead of reading it from the row. Used where the sheet's own Category
+  // column says something that isn't a customer-facing filter name — the
+  // merch tab says "Blanks" on every row, which is a production term.
+  //
+  // `group` only controls where the button sits in the filter bar:
+  //   "theme" — the design themes (anime / pride / gym / special)
+  //   "line"  — separate product lines (merch / uniform)
+  // Themes render first, then a gap, then the lines. See renderFilterBar.
   var SHEET_SOURCES = [
-    { gid: atob("MTg0ODY4NTAzMQ=="), flat: false, type: "t-shirts" },
-    { gid: "796852426", flat: true, type: "accessories" }
+    { gid: atob("MTg0ODY4NTAzMQ=="), flat: false, type: "t-shirts",   group: "theme" },
+    { gid: "796852426",  flat: true,  type: "accessories", group: "theme" },
+    { gid: "11908249",   flat: true,  type: "merch",   category: "merch",   group: "line" },
+    { gid: "1271153259", flat: true,  type: "uniform", category: "uniform", group: "line" }
   ];
 
   // Design artwork lives in this bucket under <SKU>/<SKU>.png — confirmed
@@ -185,32 +196,46 @@
     if (!sku) return Promise.resolve("");
     if (flatImageCache[sku] !== undefined) return Promise.resolve(flatImageCache[sku]);
 
-    var listUrl = DESIGN_BUCKET + "?list-type=2&prefix=" + encodeURIComponent(sku + "/");
     var skuLower = sku.toLowerCase();
 
-    return fetch(listUrl)
-      .then(function (res) {
-        if (!res.ok) throw new Error("listing failed (" + res.status + ")");
-        return res.text();
-      })
-      .then(function (xml) {
-        var doc = new DOMParser().parseFromString(xml, "text/xml");
-        var keys = Array.prototype.map.call(doc.getElementsByTagName("Key"), function (k) { return k.textContent; });
-        var imageExt = /\.(png|jpe?g|webp|avif)$/i;
-        var match = keys.filter(function (k) {
-          if (!imageExt.test(k)) return false;
-          var base = k.split("/").pop();
-          var noExt = base.slice(0, base.lastIndexOf("."));
-          return noExt.toLowerCase() === skuLower;
-        })[0];
-        var url = match ? keyToUrl(match) : "";
-        flatImageCache[sku] = url;
-        return url;
-      })
-      .catch(function () {
-        flatImageCache[sku] = "";
-        return "";
-      });
+    // S3 prefixes are case-SENSITIVE, and the bucket's folder casing does
+    // not reliably match the sheet's SKU casing — "mer-001" in the sheet is
+    // filed under "Mer-001/" in the bucket (while mer-002..005 are all
+    // lowercase). Listing only the exact prefix silently found nothing for
+    // that one product. So try the plausible casings in turn and stop at
+    // the first that yields a file. Duplicates are removed so the common
+    // case is still a single request.
+    var prefixes = [sku, skuLower, sku.charAt(0).toUpperCase() + skuLower.slice(1)]
+      .filter(function (v, i, all) { return all.indexOf(v) === i; });
+
+    var imageExt = /\.(png|jpe?g|webp|avif)$/i;
+
+    function tryPrefix(i) {
+      if (i >= prefixes.length) return Promise.resolve("");
+      var listUrl = DESIGN_BUCKET + "?list-type=2&prefix=" + encodeURIComponent(prefixes[i] + "/");
+      return fetch(listUrl)
+        .then(function (res) {
+          if (!res.ok) throw new Error("listing failed (" + res.status + ")");
+          return res.text();
+        })
+        .then(function (xml) {
+          var doc = new DOMParser().parseFromString(xml, "text/xml");
+          var keys = Array.prototype.map.call(doc.getElementsByTagName("Key"), function (k) { return k.textContent; });
+          var match = keys.filter(function (k) {
+            if (!imageExt.test(k)) return false;
+            var base = k.split("/").pop();
+            var noExt = base.slice(0, base.lastIndexOf("."));
+            return noExt.toLowerCase() === skuLower;
+          })[0];
+          return match ? keyToUrl(match) : tryPrefix(i + 1);
+        })
+        .catch(function () { return tryPrefix(i + 1); });
+    }
+
+    return tryPrefix(0).then(function (url) {
+      flatImageCache[sku] = url;
+      return url;
+    });
   }
 
   // Runs once after the catalog loads: any flat product with no sheet
@@ -357,7 +382,28 @@
       return normalizeKey(c.label) || normalizeKey(c.id) || ("col" + i);
     });
 
-    return data.table.rows.map(function (row) {
+    var rows = data.table.rows;
+
+    // Google only treats row 1 as a header when it is confident about it —
+    // on the uniform tab it was not, so every column label came back empty
+    // and the real header ("Name, SKU, Price, ...") arrived as if it were
+    // the first product. Left alone that renders a junk card called "Name"
+    // AND leaves every column unresolvable by name, since the labels the
+    // aliases match against are blank. Detect that case and promote the row.
+    var labelsBlank = data.table.cols.every(function (c) { return !normalizeKey(c.label); });
+    if (labelsBlank && rows.length) {
+      var first = rows[0].c.map(function (cell) {
+        return normalizeKey(cell ? (cell.v !== undefined ? cell.v : cell.f) : "");
+      });
+      var looksLikeHeader = first.indexOf("name") !== -1 &&
+        (first.indexOf("sku") !== -1 || first.indexOf("price") !== -1);
+      if (looksLikeHeader) {
+        cols = first.map(function (k, i) { return k || ("col" + i); });
+        rows = rows.slice(1);
+      }
+    }
+
+    return rows.map(function (row) {
       var obj = { __cols: cols };
       row.c.forEach(function (cell, i) {
         obj[cols[i]] = cell ? (cell.f !== undefined ? cell.f : cell.v) : "";
@@ -413,11 +459,19 @@
 
   // Distinct categories, in the order they're first met going down the
   // sheet — so row order decides button order.
+  // Filled in by collectCategories: category key -> "theme" | "line".
+  var categoryGroups = {};
+
   function collectCategories(products) {
     var found = [];
+    categoryGroups = {};
     products.forEach(function (p) {
       if (!p.inStock || !p.category) return;
       if (found.indexOf(p.category) === -1) found.push(p.category);
+      // First row to claim a category decides its group. In practice every
+      // row of a category comes from the same tab, so there is nothing to
+      // disagree about.
+      if (!categoryGroups[p.category]) categoryGroups[p.category] = p.categoryGroup || "theme";
     });
     return found;
   }
@@ -469,13 +523,26 @@
     var buttons = ['<button type="button" class="filter-btn w-button' +
       (activeCategory === "all" ? " is-active" : "") + '" data-category="all">ALL</button>'];
 
-    categories.forEach(function (c) {
-      buttons.push(
-        '<button type="button" class="filter-btn w-button' +
-          (activeCategory === c ? " is-active" : "") +
-          '" data-category="' + escapeAttr(c) + '">' + escapeHtml(categoryLabel(c)) + "</button>"
-      );
-    });
+    function btn(c) {
+      return '<button type="button" class="filter-btn w-button' +
+        (activeCategory === c ? " is-active" : "") +
+        '" data-category="' + escapeAttr(c) + '">' + escapeHtml(categoryLabel(c)) + "</button>";
+    }
+
+    // The design themes and the separate product lines are different kinds
+    // of thing — "anime" narrows the same shirts, "uniform" is a different
+    // catalogue altogether — so they are set apart rather than sitting in
+    // one undifferentiated row. Order within each half still follows the
+    // sheet, so row order keeps controlling button order.
+    var themeCats = categories.filter(function (c) { return categoryGroups[c] !== "line"; });
+    var lineCats  = categories.filter(function (c) { return categoryGroups[c] === "line"; });
+
+    themeCats.forEach(function (c) { buttons.push(btn(c)); });
+    // Only worth a separator when there is something on both sides of it.
+    if (themeCats.length && lineCats.length) {
+      buttons.push('<span class="filter-group-gap" aria-hidden="true"></span>');
+    }
+    lineCats.forEach(function (c) { buttons.push(btn(c)); });
 
     filterBar.innerHTML = buttons.join("");
   }
@@ -541,6 +608,7 @@
       ? preferredColorResolved
       : (availableColors[0] || null);
 
+    var sizesCell = pick(row, "sizes");
     var sideRaw = pick(row, "preferredSide").toLowerCase();
 
     return {
@@ -558,7 +626,11 @@
       // straight in Category and has no "sub filter" column at all. So:
       // prefer the "sub filter" column, fall back to Category. Both tabs
       // land on the theme, and no sheet edit is needed to make it so.
-      category: toCategoryKey(pick(row, "subcategory") || pick(row, "category")),
+      category: src.category
+        ? toCategoryKey(src.category)
+        : toCategoryKey(pick(row, "subcategory") || pick(row, "category")),
+      // Which half of the filter bar this category's button belongs in.
+      categoryGroup: src.group || "theme",
       // SUB-FILTER = what kind of product this is, taken from the tab it
       // came from (see SHEET_SOURCES) rather than any column — a tab only
       // ever sells one type. renderSubfilterBar only draws this row when
@@ -566,8 +638,15 @@
       // T-SHIRTS/ACCESSORIES while Pride (shirts only) shows nothing.
       subcategory: toCategoryKey(src.type || ""),
       colors: pick(row, "colors"),
-      // Blank cell = the full S–5XL ladder. Flat products have no sizes.
-      sizes: flat ? [] : window.EmberShirts.sizesFor(pick(row, "sizes")),
+      // For a shirt, a blank cell means the full S-5XL ladder. For a flat
+      // product it means the opposite — no sizes at all — because most of
+      // them genuinely have none (a mug, a keychain). But some do: the
+      // uniform line is polos, vests and aprons, which are sized garments.
+      // So a flat product gets sizes only when the sheet actually lists
+      // them, rather than never.
+      sizes: flat
+        ? (sizesCell ? window.EmberShirts.sizesFor(sizesCell) : [])
+        : window.EmberShirts.sizesFor(sizesCell),
       images: images.length ? images : (image ? [image] : []),
       image: image,
       designFallback: designFallback,

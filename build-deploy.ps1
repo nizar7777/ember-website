@@ -7,7 +7,22 @@
 # into a "_deploy" folder, which is what you drag to Netlify.
 #
 # Run it:   .\build-deploy.ps1
-# Then go to https://app.netlify.com/drop and drag the _deploy folder in.
+# Then, to update https://ember-collection.net :
+#   app.netlify.com -> the site serving ember-collection.net -> Deploys
+#   tab -> drag the _deploy folder onto the drop zone at the bottom.
+#
+# NOT app.netlify.com/drop — that page spins up a NEW site with a new
+# random URL on every drop and leaves the real site untouched.
+#
+# Editing the source files alone changes nothing that is live. Until this
+# script runs AND the folder is uploaded, ember-collection.net keeps
+# serving whatever was uploaded last.
+#
+# Domain note (27 Aug 2026): the site moved to the custom domain
+# ember-collection.net. The old ember-jo.netlify.app subdomain now returns
+# Netlify's own "Site not found" 404, so any link or meta tag still
+# pointing at it is dead. All canonical/og:url/og:image tags, sitemap.xml
+# and robots.txt were repointed at the new domain.
 
 $ErrorActionPreference = "Stop"
 
@@ -15,8 +30,15 @@ $source = $PSScriptRoot
 $target = Join-Path $source "_deploy"
 
 # Working files that must NOT go on the live site.
+#
+# NOTE: everything starting with a dot is dropped wholesale further down,
+# so .claude / .claude-ads / .vscode are covered twice over. They are kept
+# named here because the list doubles as the "kept private" summary this
+# script prints at the end.
 $excludeNames = @(
     "_deploy",
+    ".git",                   # see the dot-entry filter below - CRITICAL
+    ".gitattributes",
     ".claude",
     ".claude-ads",            # ad account IDs, campaign plans, budget notes
     ".vscode",
@@ -79,7 +101,18 @@ if (Test-Path $target) {
     New-Item -ItemType Directory -Path $target | Out-Null
 }
 
-Get-ChildItem -Path $source -Force | Where-Object { $excludeNames -notcontains $_.Name } | ForEach-Object {
+# Drop every dot-entry, not just the ones named above. This is the rule
+# that matters most: on 27 Aug 2026 a .git folder appeared in the project
+# and the old name-only list happily copied all 58 MB of it into _deploy.
+# A published .git is not merely bulk — anyone can fetch the objects and
+# rebuild every file in history, including the very ones this list exists
+# to keep private (SETUP-NEEDED.txt with the EmailJS IDs, .claude-ads with
+# the ad account data, order-entry.html). The same trap is waiting for any
+# future .env or .DS_Store, so exclude the whole class rather than chase
+# names one at a time.
+Get-ChildItem -Path $source -Force |
+    Where-Object { $excludeNames -notcontains $_.Name -and -not $_.Name.StartsWith(".") } |
+    ForEach-Object {
     if ($_.PSIsContainer) {
         Copy-Item $_.FullName -Destination $target -Recurse -Force
     } else {
@@ -213,7 +246,17 @@ if ($prunedBytes -gt 0) {
     Write-Host ("  dropped {0:N1} MB of unreferenced files" -f ($prunedBytes / 1MB))
 }
 Write-Host ""
-Write-Host "Next: open https://app.netlify.com/drop and drag the _deploy folder onto it."
+Write-Host "Next - UPDATE THE EXISTING SITE:" -ForegroundColor Green
+Write-Host "  1. https://app.netlify.com  ->  the site serving ember-collection.net"
+Write-Host "  2. Deploys tab"
+Write-Host "  3. Drag the _deploy FOLDER onto the drop zone at the bottom"
+Write-Host "     ('Drag and drop your site output folder here')"
+Write-Host "  4. Wait for 'Published', then hard-refresh: Ctrl+Shift+R"
+Write-Host ""
+Write-Host "Do NOT use app.netlify.com/drop." -ForegroundColor Red
+Write-Host "  That page creates a BRAND NEW site with a new random URL every" -ForegroundColor Red
+Write-Host "  time. ember-collection.net would stay on the old version, which" -ForegroundColor Red
+Write-Host "  looks exactly like 'my changes aren't showing up'." -ForegroundColor Red
 Write-Host ""
 Write-Host "Excluded from the upload (kept private):" -ForegroundColor Yellow
 $excludeNames | ForEach-Object { Write-Host "  - $_" }

@@ -2482,6 +2482,20 @@ p {
   padding-bottom: 30px;
 }
 
+/* Separates the design themes (anime/pride/gym/special) from the standalone
+   product lines (merch/uniform) in the store filter bar. A gap plus a hairline
+   rather than a plain gap, because the bar wraps onto a second row on narrow
+   screens and a gap alone reads as "the row just ended there". Built by
+   renderFilterBar in js/store-products.js, and only when both halves exist. */
+.filter-group-gap {
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 1px;
+  min-height: 26px;
+  margin-inline: 10px;
+  background: #ffffff2e;
+}
+
 .filter-btn {
   border-radius: var(--_spacing---spacing-large);
   color: var(--_color---white);

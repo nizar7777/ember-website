@@ -13,4 +13,4 @@ Disallow: /order-confirmation.html
 Disallow: /paypal-checkout.html
 Disallow: /401.html
 
-Sitemap: https://ember-jo.netlify.app/sitemap.xml
+Sitemap: https://ember-collection.net/sitemap.xml
