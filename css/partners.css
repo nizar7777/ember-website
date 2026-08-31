@@ -381,6 +381,25 @@ html { background: var(--ember-surface); }
 }
 .p-shot img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
 
+/* A slot holding a photo has stopped being a placeholder, so the dashed
+   outline and the padding that centred the TODO label both go. The wide
+   slot's accent border goes with them: it was flagging the slot as the most
+   important one still empty, not decorating it. */
+.p-shot:has(img),
+.p-stand__fallback:has(img) {
+  padding: 0;
+  border: 1px solid var(--ember-hairline);
+  overflow: hidden;
+}
+/* min-height was reserving space for absent art; the image sets its own. */
+.p-stand__fallback:has(img) { min-height: 0; }
+.p-stand__fallback img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
 /* --- categories ------------------------------------------------------- */
 .p-cats {
   display: grid;

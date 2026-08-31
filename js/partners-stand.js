@@ -44,8 +44,38 @@ function webglOK() {
   }
 }
 
+/* Reduced motion, no WebGL, a failed three.js import and a failed model
+   fetch all land here. Dropping the canvas is not enough on its own: the
+   <noscript> still never renders, because JS is running — so the section
+   went silent about the one object the whole page is selling. Inject the
+   same still the <noscript> holds. */
+const STILL = {
+  src: "images/partners/stand-render.webp",
+  w: 1600,
+  h: 900,
+  alt: "ستاند إمبر: ثلاث أذرع عليها تيشيرتات سودا وبيضا ورمادي، وشعار إمبر فوق."
+};
+
 function fallback() {
   if (CANVAS) CANVAS.remove();
+  if (!SECTION || SECTION.querySelector(".p-stand__fallback")) return;
+
+  const img = document.createElement("img");
+  img.src = STILL.src;
+  img.width = STILL.w;
+  img.height = STILL.h;
+  img.alt = STILL.alt;
+  img.loading = "lazy";
+
+  const box = document.createElement("div");
+  box.className = "p-stand__fallback";
+  box.appendChild(img);
+
+  const wrap = document.createElement("div");
+  wrap.className = "wrap";
+  wrap.appendChild(box);
+
+  SECTION.appendChild(wrap);
 }
 
 /* Deterministic scatter — a seeded hash on the part index rather than
