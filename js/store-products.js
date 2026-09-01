@@ -1170,6 +1170,10 @@
         name: modalProduct.name,
         price: linePrice,
         image: modalProduct.image,
+        // What kind of product this is, so the basket can price the
+        // shirt+accessory pair offer without guessing from the SKU.
+        // See js/offers.js.
+        type: modalProduct.subcategory,
         size: size,
         color: modalColor ? modalColor.label : "",
         notes: modalNotes.value.trim(),

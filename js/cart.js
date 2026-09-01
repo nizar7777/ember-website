@@ -37,6 +37,9 @@
         name: item.name || "Untitled",
         price: item.price || "",
         image: item.image || "",
+        // "t-shirts" / "accessories" / "merch" / "uniform" - drives the
+        // pair offer in js/offers.js.
+        type: item.type || "",
         color: item.color || "",
         size: item.size || "",
         notes: item.notes || "",

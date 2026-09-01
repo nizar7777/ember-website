@@ -230,3 +230,58 @@
   text-align: center;
   text-decoration: none;
 }
+
+/* --- Offer rows in the order summary ---------------------------------
+   Mirror .checkout-subtotal-row so the block reads as one ledger. Both
+   stay hidden until an offer actually applies (js/checkout.js), so a
+   basket with nothing to discount looks unchanged. */
+.checkout-discount-row,
+.checkout-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding-top: 10px;
+  font-family: "IBM Plex Mono", sans-serif;
+  font-size: 13px;
+}
+
+.checkout-discount-row[hidden],
+.checkout-total-row[hidden],
+.checkout-nudge[hidden] {
+  display: none;
+}
+
+.checkout-discount-row {
+  color: var(--_color---dib-oringe);
+}
+
+.checkout-discount-value {
+  white-space: nowrap;
+}
+
+.checkout-total-row {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ember-hairline, #ffffff26);
+  font-size: 16px;
+  color: var(--_color---white);
+}
+
+.checkout-total-value {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* "Add 1 more piece to get 16% off" — only shown when the basket is
+   within reach of the threshold. */
+.checkout-nudge {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px dashed var(--_color---dib-oringe);
+  color: var(--_color---text-color-three);
+  font-family: "IBM Plex Mono", sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+}

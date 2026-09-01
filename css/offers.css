@@ -1,0 +1,62 @@
+/* ---------------------------------------------------------------------
+   Offer strip. Deliberately quiet: a row of the page's own type and the
+   existing accent, not a loud promo bar, so it sits inside the store
+   layout without shouting over the products. Markup comes from
+   js/offer-banner.js.
+--------------------------------------------------------------------- */
+[data-offer-banner][hidden] { display: none; }
+
+.offer-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  margin-bottom: 22px;
+  padding: 14px 18px;
+  border: 1px solid var(--_color---dib-oringe);
+  border-radius: 10px;
+  background: #ffffff08;
+}
+
+.offer-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.offer-pill__n {
+  font-family: "Anton", "IBM Plex Sans", sans-serif;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: .01em;
+  color: var(--_color---dib-oringe);
+}
+
+.offer-pill__t {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 14px;
+  color: var(--_color---white);
+}
+
+.offer-sep {
+  width: 1px;
+  align-self: stretch;
+  min-height: 22px;
+  background: #ffffff2e;
+}
+
+.offer-note {
+  font-family: "IBM Plex Mono", sans-serif;
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--_color---text-color-three);
+  margin-left: auto;
+}
+
+@media screen and (max-width: 767px) {
+  .offer-strip { gap: 10px 12px; padding: 12px 14px; }
+  .offer-sep { display: none; }
+  .offer-note { margin-left: 0; flex-basis: 100%; }
+}

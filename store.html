@@ -58,6 +58,7 @@
   }
 }
 </script>
+  <link href="css/offers.css" rel="stylesheet" type="text/css">
   <link href="css/system.css" rel="stylesheet" type="text/css">
 </head>
 <body class="body-4">
@@ -125,6 +126,8 @@
     <section class="licenses">
       <div class="store-wrap">
         <div class="w-layout-blockcontainer store-container w-container">
+          <!-- Live offers, built by js/offer-banner.js from js/offers.js -->
+          <div data-offer-banner hidden></div>
           <div class="store-toolbar">
             <!-- Buttons are built from the Category column in the Google
                  Sheet, so adding or removing a category there is all that's
@@ -200,5 +203,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="js/contact-forms.js"></script>
   <script src="js/modal-a11y.js"></script>
+  <script src="js/offers.js"></script>
+  <script src="js/offer-banner.js"></script>
 </body>
 </html>

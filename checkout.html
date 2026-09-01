@@ -37,6 +37,7 @@
   <link href="images/favicon.png" rel="icon" type="image/png" sizes="32x32" media="(prefers-color-scheme: light)">
   <link href="images/favicon-dark.png" rel="icon" type="image/png" sizes="32x32" media="(prefers-color-scheme: dark)">
   <link href="images/webclip.png" rel="apple-touch-icon">
+  <link href="css/offers.css" rel="stylesheet" type="text/css">
   <link href="css/system.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -120,12 +121,25 @@
 
         <div id="checkout-layout" class="cd-layout">
           <div class="cd-stage-col">
+            <div data-offer-banner hidden></div>
             <div class="cd-tool-label">/ / Order summary</div>
             <div id="checkout-items" class="checkout-items"></div>
             <div class="checkout-subtotal-row">
               <span>Subtotal</span>
               <span id="checkout-subtotal" class="checkout-subtotal-value"></span>
             </div>
+            <!-- Both rows are filled in by js/checkout.js from EmberOffers
+                 and stay hidden while no offer applies, so a basket with
+                 nothing to discount looks exactly as it did before. -->
+            <div class="checkout-discount-row" id="checkout-discount-row" hidden>
+              <span id="checkout-discount-label">Offer</span>
+              <span id="checkout-discount" class="checkout-discount-value"></span>
+            </div>
+            <div class="checkout-total-row" id="checkout-total-row" hidden>
+              <span>Total</span>
+              <span id="checkout-total" class="checkout-total-value"></span>
+            </div>
+            <div class="checkout-nudge" id="checkout-nudge" hidden></div>
           </div>
 
           <div class="cd-tools-col">
@@ -229,8 +243,10 @@
   <script src="js/shirt-colors.js"></script>
   <script src="js/nav-scroll.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="js/offers.js"></script>
   <script src="js/checkout.js"></script>
   <script src="js/contact-forms.js"></script>
   <script src="js/modal-a11y.js"></script>
+  <script src="js/offer-banner.js"></script>
 </body>
 </html>

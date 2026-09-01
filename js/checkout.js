@@ -28,6 +28,25 @@
   var layoutEl = document.getElementById("checkout-layout");
   var itemsEl = document.getElementById("checkout-items");
   var subtotalEl = document.getElementById("checkout-subtotal");
+  var discountRowEl = document.getElementById("checkout-discount-row");
+  var discountLabelEl = document.getElementById("checkout-discount-label");
+  var discountEl = document.getElementById("checkout-discount");
+  var totalRowEl = document.getElementById("checkout-total-row");
+  var totalEl = document.getElementById("checkout-total");
+  var nudgeEl = document.getElementById("checkout-nudge");
+
+  // The one place the basket total is worked out. Everything that needs a
+  // figure - the summary rows, the CliQ amount, the emailed order and the
+  // pixel - goes through this so they cannot disagree. Falls back to the
+  // plain subtotal if js/offers.js somehow did not load, which fails safe:
+  // the customer is quoted the undiscounted price rather than a total the
+  // shop never agreed to.
+  function priced() {
+    var items = window.EmberCart ? EmberCart.getItems() : [];
+    if (window.EmberOffers) return EmberOffers.compute(items);
+    var sub = window.EmberCart ? EmberCart.getSubtotal() : 0;
+    return { subtotal: sub, total: sub, discount: 0, label: "", piecesToBulk: 0 };
+  }
   var form = document.getElementById("checkout-form");
   var statusEl = document.getElementById("checkout-status");
   var submitBtn = document.getElementById("checkout-submit-btn");
@@ -47,7 +66,7 @@
   }
 
   function openCliqModal() {
-    if (window.EmberCart) cliqAmountEl.textContent = EmberCart.getSubtotal().toFixed(2) + " JOD";
+    if (window.EmberCart) cliqAmountEl.textContent = priced().total.toFixed(2) + " JOD";
     document.body.classList.add("pm-open");
     cliqBackdropEl.classList.add("is-open");
     cliqModalEl.classList.add("is-open");
@@ -136,7 +155,26 @@
       );
     }).join("");
 
-    subtotalEl.textContent = EmberCart.getSubtotal().toFixed(2) + " JOD";
+    var p = priced();
+    subtotalEl.textContent = p.subtotal.toFixed(2) + " JOD";
+
+    var hasOffer = p.discount > 0.001;
+    discountRowEl.hidden = !hasOffer;
+    totalRowEl.hidden = !hasOffer;
+    if (hasOffer) {
+      discountLabelEl.textContent = p.label || "Offer";
+      discountEl.textContent = "-" + p.discount.toFixed(2) + " JOD";
+      totalEl.textContent = p.total.toFixed(2) + " JOD";
+    }
+
+    // One piece short of the bulk discount is worth saying out loud.
+    if (!hasOffer && p.piecesToBulk > 0 && p.piecesToBulk <= 2 && p.subtotal > 0) {
+      nudgeEl.textContent = "Add " + p.piecesToBulk + " more piece" +
+        (p.piecesToBulk > 1 ? "s" : "") + " to get " + EmberOffers.BULK_PERCENT + "% off.";
+      nudgeEl.hidden = false;
+    } else {
+      nudgeEl.hidden = true;
+    }
   }
 
   itemsEl.addEventListener("click", function (e) {
@@ -207,13 +245,18 @@
       customer_city: city,
       notes: notes || "—",
       order_items: orderItemsText(items),
-      order_subtotal: EmberCart.getSubtotal().toFixed(2) + " JOD",
+      order_subtotal: (function () {
+        var p = priced();
+        return p.discount > 0.001
+          ? p.subtotal.toFixed(2) + " JOD  ->  " + p.total.toFixed(2) + " JOD  (" + p.label + ")"
+          : p.total.toFixed(2) + " JOD";
+      })(),
       payment_method: paymentMethod
     }).then(function () {
       // Fires before clear(), while the subtotal still exists. This is a
       // Lead, not a Purchase — nothing has been paid at this point.
       if (window.EmberPixel) {
-        window.EmberPixel.lead("checkout:" + paymentMethod, EmberCart.getSubtotal());
+        window.EmberPixel.lead("checkout:" + paymentMethod, priced().total);
       }
       EmberCart.clear();
       layoutEl.hidden = true;
