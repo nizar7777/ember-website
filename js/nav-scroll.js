@@ -80,20 +80,30 @@
     document.addEventListener("mousemove", function (e) {
       if (fine && !fine.matches) return;
 
-      // getBoundingClientRect on the hidden nav still reports its laid-out
-      // box, but it is translated up out of view, so measure the band from
-      // the top of the viewport down past where the nav sits when shown.
-      var h = nav.offsetHeight || 80;
-      var near = e.clientY <= h + NEAR_PX;
+      // The nav is translated out of view while hidden and reports an
+      // offsetHeight of 0 on some pages, so fall back to a sensible bar
+      // height rather than collapsing the band to nothing.
+      var band = (nav.offsetHeight || 80) + NEAR_PX;
+
+      // Hysteresis: reveal on the way in at `band`, but do not hide again
+      // until clearly outside it. Without the gap the nav flickers when the
+      // pointer sits right on the boundary.
+      var near = pointerNear ? e.clientY <= band + 60 : e.clientY <= band;
 
       if (near === pointerNear) return;
       pointerNear = near;
       update();
     }, { passive: true });
 
-    // Leaving the window entirely should not leave the nav stuck open.
-    document.addEventListener("mouseleave", function () {
+    // Leaving the window should not leave the nav stuck open — EXCEPT when
+    // the pointer left over the top edge, which is exactly the gesture for
+    // reaching at the nav. Hiding on that made the bar vanish at the moment
+    // you arrived at it: you cross into the band, it appears, you keep
+    // going toward the browser chrome, mouseleave fires and it is gone.
+    document.addEventListener("mouseleave", function (e) {
       if (!pointerNear) return;
+      var band = (nav.offsetHeight || 80) + NEAR_PX;
+      if (e.clientY <= band) return;   // went up and out: keep it open
       pointerNear = false;
       update();
     });
