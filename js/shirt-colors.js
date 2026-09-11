@@ -24,23 +24,15 @@
   // swatch   — the dot shown in colour pickers
   // front/back — where the mockup photo actually lives.
   //
-  // As of 2 Aug 2026, 6 of 7 colours are hosted on the public S3 bucket
-  // (ember-products, eu-north-1, mockup/ prefix) instead of shipping in
-  // this repo — confirmed live by fetching each URL directly. This also
-  // fixes a real bug: build-deploy.ps1 only ships mockup/*.webp to
-  // production, and black/green/peach never had .webp versions, so those
-  // three colours were completely broken on any deployed build.
+  // Mockups are served from this repo (GitHub Pages), not S3.
   //
-  // CAVEAT: the bucket currently only has the original 2402x3481 PNG
-  // masters (2-3.7 MB each), not the optimized .webp (~50KB each) that
-  // tools/convert-mockups.html used to generate locally. This fixes
-  // correctness but not load time — if you upload .webp versions at the
-  // same path with a .webp extension, flip the extensions below and every
-  // product card gets noticeably lighter.
-  // Bucket mockups were bulk-converted to WebP on 26 Aug 2026 (94% smaller
-  // overall) via a one-off script; originals are still in the bucket under
-  // .png but nothing reads them any more.
-  var MOCKUP_BASE = "https://ember-products.s3.eu-north-1.amazonaws.com/mockup/";
+  // They lived in the ember-products bucket from 2 Aug 2026 until AWS
+  // suspended that account on 1 Sep 2026 over billing, which took every
+  // product image on the live site down with it. As WebP the whole set is
+  // ~1.5 MB, so there was never much reason for it to sit behind a paid
+  // service in the first place - and served from the repo they cost
+  // nothing, need no bucket policy, and cannot be switched off.
+  var MOCKUP_BASE = "mockup/";
   var COLORS = [
     {
       key: "black", label: "Black", swatch: "#2f2f2f",

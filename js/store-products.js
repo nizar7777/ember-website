@@ -77,180 +77,101 @@
     { gid: "1271153259", flat: true,  type: "uniform", category: "uniform", group: "line" }
   ];
 
-  // Design artwork lives in this bucket under <SKU>/<SKU>.png — confirmed
-  // 2 Aug 2026 against R-001, 7-001 and S-001. Built from the SKU column
-  // directly so nobody has to paste a URL into the sheet's Image column by
-  // hand; that column still works as an override for anything that
-  // doesn't follow the convention (a different extension, an SKU whose
-  // folder is named differently, etc).
-  //
-  // The bucket's folder casing turned out to be inconsistent — checked all
-  // 57 SKUs on 6 Aug 2026: R-001, S-001 and every W7-xxx only resolve with
-  // their sheet casing exactly as typed, while ~29 others (Ani-002..011,
-  // JO-002..008, UH-001..008, Si-001, S-002/003) only resolve fully
-  // lowercased. Rather than push everyone through a sheet-wide SKU rename,
-  // the card tries the exact casing first and silently retries lowercase
-  // on failure — see the shirt-shot-design fallback in the grid's error
-  // handler below.
-  //
-  // Confirmed against a full bucket listing on 13 Aug 2026 (now that
-  // ListBucket is allowed — see js/shirt-colors.js for the same story with
-  // mockup colours): Ani-001 and JO-001 genuinely have no folder at all,
-  // nothing to fall back to. MU-001..004 looked the same at first, but
-  // they're not missing — they're filed under mu-1..mu-4, not zero-padded
-  // like every other SKU. That's not a casing difference the lowercase
-  // fallback can catch, so it's a direct override instead.
-  var DESIGN_BUCKET = "https://ember-products.s3.eu-north-1.amazonaws.com/";
-
-  var DESIGN_URL_OVERRIDES = {
-    "MU-001": "mu-1/mu-1.webp",
-    "MU-002": "mu-2/mu-2.webp",
-    "MU-003": "mu-3/mu-3.webp",
-    "MU-004": "mu-4/mu-4.webp"
-  };
-
-  // Bucket images were bulk-converted to WebP on 26 Aug 2026 (94% smaller —
-  // 490MB -> 27.5MB) via a one-off script; originals are still in the
-  // bucket under .png/.jpg but nothing reads them any more.
-  function defaultDesignUrl(sku) {
-    if (!sku) return "";
-    if (DESIGN_URL_OVERRIDES[sku]) return DESIGN_BUCKET + DESIGN_URL_OVERRIDES[sku];
-    return DESIGN_BUCKET + encodeURIComponent(sku) + "/" + encodeURIComponent(sku) + ".webp";
-  }
-
-  function lowercaseDesignUrl(sku) {
-    if (!sku || DESIGN_URL_OVERRIDES[sku]) return "";
-    var lower = sku.toLowerCase();
-    return DESIGN_BUCKET + encodeURIComponent(lower) + "/" + encodeURIComponent(lower) + ".webp";
-  }
-
   // ---------------------------------------------------------------------
-  // Extra promotional photos, discovered from the bucket instead of typed
-  // into a sheet column — whatever else is sitting in a SKU's folder,
-  // under whatever name, shows up on hover automatically.
+  // Product artwork, served from this repo (GitHub Pages) via
+  // products/manifest.json.
   //
-  // This needs TWO bucket settings beyond what GetObject-per-file already
-  // needed, and neither is a code problem if it's not working:
-  //   1. Bucket policy: s3:ListBucket allowed for "*" (Resource is the
-  //      BUCKET, arn:aws:s3:::ember-products — not .../* like GetObject).
-  //   2. CORS config: GET allowed from this site's origin. <img> tags
-  //      don't need this (that's why the design/mockup photos already
-  //      work without it) but fetch() reading a response body does.
-  // Until both are set, listing 403s and this quietly finds nothing —
-  // see the .catch below.
+  // It used to come from the ember-products S3 bucket. AWS suspended that
+  // account on 1 Sep 2026 over billing and every image on the live store
+  // went dark with it, so the whole set was re-encoded from the local
+  // masters (482 MB -> 28.6 MB as WebP) and moved in here. It costs
+  // nothing, needs no bucket policy or CORS rule, and cannot be switched
+  // off by a third party.
+  //
+  // The manifest is generated from the products/ folder and maps each SKU
+  // folder to the files inside it:
+  //     { "W7-001": ["Artboard 1.webp", "W7-001.webp"], ... }
+  //
+  // Looking SKUs up through it rather than building URLs by hand also
+  // retires a long tail of workarounds the bucket forced on us: folder
+  // casing that disagreed with the sheet (Mer-001 vs mer-001, W7-xxx vs
+  // w7-xxx), the zero-padding mismatch on MU-001..004 that needed a hard
+  // coded override table, the lowercase-retry fallback on image error, and
+  // the s3:ListBucket + CORS grants that hover photos depended on. The
+  // manifest simply says what exists.
   // ---------------------------------------------------------------------
-  var folderPhotoCache = {}; // sku -> array of photo URLs (populated once, then reused)
+  var PRODUCTS_BASE = "products/";
 
-  function keyToUrl(key) {
-    return DESIGN_BUCKET + key.split("/").map(encodeURIComponent).join("/");
-  }
-
-  function extraPhotosFor(product) {
-    var sku = product.sku;
-    if (!sku) return Promise.resolve([]);
-    if (folderPhotoCache[sku]) return Promise.resolve(folderPhotoCache[sku]);
-
-    var listUrl = DESIGN_BUCKET + "?list-type=2&prefix=" + encodeURIComponent(sku + "/");
-    // The design file itself (either casing) isn't an "extra" photo —
-    // exclude whichever one this product actually resolved to, plus its
-    // sibling casing, so a hover cycle never just repeats the mockup art.
-    var designKeys = [sku + "/" + sku + ".png", sku.toLowerCase() + "/" + sku.toLowerCase() + ".png"]
-      .map(function (k) { return k.toLowerCase(); });
-
-    return fetch(listUrl)
-      .then(function (res) {
-        if (!res.ok) throw new Error("listing failed (" + res.status + ")");
-        return res.text();
-      })
-      .then(function (xml) {
-        var doc = new DOMParser().parseFromString(xml, "text/xml");
-        var keys = Array.prototype.map.call(doc.getElementsByTagName("Key"), function (k) { return k.textContent; });
-        var imageExt = /\.(png|jpe?g|webp)$/i;
-        var extras = keys
-          .filter(function (k) { return imageExt.test(k) && designKeys.indexOf(k.toLowerCase()) === -1; })
-          .map(keyToUrl);
-        folderPhotoCache[sku] = extras;
-        return extras;
-      })
-      .catch(function () {
-        // Listing not enabled yet (see comment above), or a genuine
-        // network hiccup — either way, no extra photos, not an error the
-        // customer needs to see.
-        folderPhotoCache[sku] = [];
-        return [];
+  var manifest = null;            // sku(lowercased) -> { dir: realName, files: [...] }
+  var manifestLoose = null;       // same, keyed by SKU with zero-padding normalised
+  var manifestReady = fetch(PRODUCTS_BASE + "manifest.json")
+    .then(function (res) {
+      if (!res.ok) throw new Error("manifest " + res.status);
+      return res.json();
+    })
+    .then(function (raw) {
+      manifest = {};
+      manifestLoose = {};
+      Object.keys(raw).forEach(function (dir) {
+        var entry = { dir: dir, files: raw[dir] };
+        manifest[dir.toLowerCase()] = entry;
+        manifestLoose[looseKey(dir)] = entry;
       });
-  }
+      return manifest;
+    })
+    .catch(function (err) {
+      // Without it every product falls back to the "photo coming soon"
+      // tile rather than the page breaking.
+      console.error("Product manifest failed to load:", err);
+      manifest = {};
+      return manifest;
+    });
 
-  // ---------------------------------------------------------------------
-  // A flat (non-apparel) product's own photo, when the sheet's Image
-  // column is left blank — found by listing the SKU's bucket folder,
-  // same mechanism as extraPhotosFor above. Unlike t-shirt designs
-  // (always <SKU>/<SKU>.webp, a format this site controls via the
-  // compression script), these are whatever a seller actually uploaded —
-  // acc-001 came in as .avif, acc-002/003/004 as .png — so this matches
-  // <SKU>.<any image extension> instead of assuming one fixed extension.
-  // ---------------------------------------------------------------------
-  var flatImageCache = {}; // sku -> resolved URL, or "" if none found (populated once, then reused)
-
-  function flatImageFor(sku) {
-    if (!sku) return Promise.resolve("");
-    if (flatImageCache[sku] !== undefined) return Promise.resolve(flatImageCache[sku]);
-
-    var skuLower = sku.toLowerCase();
-
-    // S3 prefixes are case-SENSITIVE, and the bucket's folder casing does
-    // not reliably match the sheet's SKU casing — "mer-001" in the sheet is
-    // filed under "Mer-001/" in the bucket (while mer-002..005 are all
-    // lowercase). Listing only the exact prefix silently found nothing for
-    // that one product. So try the plausible casings in turn and stop at
-    // the first that yields a file. Duplicates are removed so the common
-    // case is still a single request.
-    var prefixes = [sku, skuLower, sku.charAt(0).toUpperCase() + skuLower.slice(1)]
-      .filter(function (v, i, all) { return all.indexOf(v) === i; });
-
-    var imageExt = /\.(png|jpe?g|webp|avif)$/i;
-
-    function tryPrefix(i) {
-      if (i >= prefixes.length) return Promise.resolve("");
-      var listUrl = DESIGN_BUCKET + "?list-type=2&prefix=" + encodeURIComponent(prefixes[i] + "/");
-      return fetch(listUrl)
-        .then(function (res) {
-          if (!res.ok) throw new Error("listing failed (" + res.status + ")");
-          return res.text();
-        })
-        .then(function (xml) {
-          var doc = new DOMParser().parseFromString(xml, "text/xml");
-          var keys = Array.prototype.map.call(doc.getElementsByTagName("Key"), function (k) { return k.textContent; });
-          var match = keys.filter(function (k) {
-            if (!imageExt.test(k)) return false;
-            var base = k.split("/").pop();
-            var noExt = base.slice(0, base.lastIndexOf("."));
-            return noExt.toLowerCase() === skuLower;
-          })[0];
-          return match ? keyToUrl(match) : tryPrefix(i + 1);
-        })
-        .catch(function () { return tryPrefix(i + 1); });
-    }
-
-    return tryPrefix(0).then(function (url) {
-      flatImageCache[sku] = url;
-      return url;
+  // Zero-padding is not agreed between the sheet and the folders: the sheet
+  // says MU-001..004 while the artwork sits in mu-1..mu-4. Normalising each
+  // run of digits to its integer value makes those meet in the middle
+  // (mu-001 and mu-1 both become mu-1) without a hand-maintained table of
+  // exceptions like the one this replaces. Checked against all 70 folders:
+  // no two normalise to the same key.
+  function looseKey(s) {
+    return String(s || "").toLowerCase().replace(/\d+/g, function (d) {
+      return String(parseInt(d, 10));
     });
   }
 
-  // Runs once after the catalog loads: any flat product with no sheet
-  // Image override still shows "photo coming soon" until this resolves,
-  // then the grid quietly re-renders with the real photo in place.
-  function hydrateFlatImages(products) {
-    products.forEach(function (p) {
-      if (!p.flat || p.image || !p.sku) return;
-      flatImageFor(p.sku).then(function (url) {
-        if (!url) return;
-        p.image = url;
-        p.images = [url];
-        renderProducts();
-      });
-    });
+  // Exact match wins; the loosened one is only a fallback, so a real folder
+  // can never be shadowed by a coincidence of padding.
+  function entryFor(sku) {
+    if (!manifest || !sku) return null;
+    return manifest[String(sku).toLowerCase()] ||
+           (manifestLoose && manifestLoose[looseKey(sku)]) || null;
+  }
+
+  function fileUrl(dir, file) {
+    return PRODUCTS_BASE + encodeURIComponent(dir) + "/" + encodeURIComponent(file);
+  }
+
+  // The product's own artwork: the file named after the SKU. Matched
+  // case-insensitively because the folders and the sheet disagree on case
+  // for a handful of SKUs.
+  function designUrl(sku) {
+    var entry = entryFor(sku);
+    if (!entry) return "";
+    var want = looseKey(sku);
+    var hit = entry.files.filter(function (f) {
+      return looseKey(f.slice(0, f.lastIndexOf("."))) === want;
+    })[0];
+    return hit ? fileUrl(entry.dir, hit) : "";
+  }
+
+  // Everything else sitting in that SKU's folder, shown on hover.
+  function extraPhotoUrls(sku) {
+    var entry = entryFor(sku);
+    if (!entry) return [];
+    var want = looseKey(sku);
+    return entry.files
+      .filter(function (f) { return looseKey(f.slice(0, f.lastIndexOf("."))) !== want; })
+      .map(function (f) { return fileUrl(entry.dir, f); });
   }
 
   // Column aliases, so the page keeps working if the sheet's headers get
@@ -590,12 +511,10 @@
     var hasOverride = images.length > 0;
     // A flat product has no shirt design to auto-derive from the bucket —
     // just whatever's typed in Image, same as any other sheet's override.
-    var image = images[0] || (flat ? "" : defaultDesignUrl(sku));
-    // Only meaningful for the auto-derived URL — a sheet override is
-    // whatever the seller explicitly typed, not ours to second-guess.
-    var designFallback = (!flat && !hasOverride && sku) ? lowercaseDesignUrl(sku) : "";
-    // Nothing to fall back to if the SKU was already all-lowercase.
-    if (designFallback === image) designFallback = "";
+    // The manifest resolves shirts and flat products alike, so the two no
+    // longer need separate paths — and because it lists what actually
+    // exists, there is no casing guess left to fall back from.
+    var image = images[0] || designUrl(sku);
 
     var availableColors = flat ? [] : window.EmberShirts.availableFor(pick(row, "colors"));
 
@@ -649,7 +568,6 @@
         : window.EmberShirts.sizesFor(sizesCell),
       images: images.length ? images : (image ? [image] : []),
       image: image,
-      designFallback: designFallback,
       description: pick(row, "description"),
       buyLink: pick(row, "buyLink"),
       inStock: !hidden,
@@ -794,7 +712,7 @@
           '" loading="lazy" style="object-fit:' + window.EmberShirts.fitFor(colorObj) + '">' +
         '<img class="shirt-shot-design" src="' + escapeAttr(product.image) +
           '" alt="' + escapeAttr(product.description || product.name) +
-          '"' + (product.designFallback ? ' data-design-fallback="' + escapeAttr(product.designFallback) + '"' : "") +
+          '"' +
           ' loading="lazy">' +
         hoverLayer +
       "</div>"
@@ -915,7 +833,7 @@
     var product = visibleProducts[parseInt(index, 10)];
     if (!product || !product.sku) return;
 
-    extraPhotosFor(product).then(function (bucketPhotos) {
+    Promise.resolve(extraPhotoUrls(product.sku)).then(function (bucketPhotos) {
       // Slow fetch outlasting a quick mouse pass shouldn't start a cycle
       // for a card that isn't hovered any more.
       if (!shot.matches(":hover")) return;
@@ -1381,7 +1299,13 @@
   // caught per-source (contributing zero products rather than rejecting
   // the whole batch), so a typo'd gid on one tab can't blank out the
   // entire store — the working tabs still render.
-  Promise.all(SHEET_SOURCES.map(function (src) {
+  // toProduct resolves every image through the manifest, so the catalogue
+  // cannot be built until it has landed — otherwise the first render would
+  // give every product an empty image and fall back to "photo coming soon"
+  // across the board. Fetched in parallel with the sheets, not after it, so
+  // this costs no extra time.
+  manifestReady.then(function () {
+  return Promise.all(SHEET_SOURCES.map(function (src) {
     return fetch(sheetUrl(src.gid))
       .then(function (res) {
         if (!res.ok) throw new Error("Sheet request failed (" + res.status + ")");
@@ -1402,7 +1326,8 @@
         console.error("Sheet source failed (gid " + src.gid + "):", err);
         return [];
       });
-  }))
+  }));
+  })
     .then(function (productLists) {
       allProducts = [].concat.apply([], productLists);
       categories = collectCategories(allProducts);
@@ -1410,7 +1335,6 @@
       renderFilterBar();
       renderSubfilterBar();
       renderProducts();
-      hydrateFlatImages(allProducts);
     })
     .catch(function (err) {
       console.error(err);

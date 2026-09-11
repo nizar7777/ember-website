@@ -23,3 +23,9 @@ order-entry.html
 # Local-only tooling
 serve.ps1
 tools/
+
+# Mockup PNG masters. The site only ever loads mockup/*.webp (~1.5 MB for
+# the set); the PNGs are the ~23 MB originals those are generated from.
+# Keep them on disk, out of the repo.
+mockup/*.png
+mockup/*.jpg
