@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ember — Clothing &amp; Uniform, Amman</title>
+  <meta name="description" content="Local culture, made contemporary. Streetwear and uniform from Amman.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Review build. Kept out of search until it is promoted to the root. -->
+  <meta name="robots" content="noindex, nofollow">
+  <meta property="og:title" content="Ember — Clothing &amp; Uniform, Amman">
+  <meta property="og:description" content="Local culture, made contemporary. Streetwear and uniform from Amman.">
+  <meta property="og:image" content="https://ember-collection.net/images/og-ember.jpg">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="../images/favicon.png" type="image/png" sizes="32x32">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preload" href="../fonts/Humane-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <style>
+    @font-face {
+      font-family: "Humane";
+      src: url("../fonts/Humane-Regular.woff2") format("woff2");
+      font-display: swap;
+    }
+  </style>
+  <link rel="stylesheet" href="v2.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="bar">
+  <a class="bar__mark" href="#main" aria-label="Ember, home">
+    <img src="../images/Artboard-12_1.svg" alt="" width="22" height="36">
+    <span>Ember</span>
+  </a>
+  <div class="bar__right">
+    <a class="btn-ghost" href="../store.html">Store</a>
+    <button type="button" class="btn-ghost" id="menu-open" aria-expanded="false" aria-controls="sheet">Menu</button>
+  </div>
+</header>
+
+<!-- Full-screen menu instead of six links painted onto the hero photo.
+     It is the one piece of chrome, and it gets out of the way again. -->
+<nav class="sheet" id="sheet" aria-label="Main" aria-hidden="true">
+  <button type="button" class="btn-ghost sheet__close" id="menu-close">Close</button>
+  <div class="sheet__list">
+    <a class="sheet__link" href="../store.html">Store</a>
+    <a class="sheet__link" href="../store.html?category=merch">Merch</a>
+    <a class="sheet__link" href="../store.html?category=uniform">Uniform</a>
+    <a class="sheet__link" href="../custom-design.html">Custom</a>
+    <a class="sheet__link" href="../partners.html">Retail partners</a>
+    <a class="sheet__link" href="../change-log.html">Events</a>
+  </div>
+  <p class="sheet__meta">Amman, Jordan &middot; 078 621 3703</p>
+</nav>
+
+<main id="main" tabindex="-1">
+
+  <!-- Hero: one garment, centred, with the wordmark ghosted behind it.
+       The middle of the screen stays empty on purpose. -->
+  <section class="hero">
+    <div class="hero__word" aria-hidden="true">EMBER</div>
+
+    <div class="hero__stage">
+      <div class="hero__shot" data-r>
+        <img class="base" src="../mockup/black back.webp" alt="" loading="eager" fetchpriority="high">
+        <img class="art" src="../products/7-001/7-001.webp" alt="The 7shm tee, printed on black" loading="eager" fetchpriority="high">
+      </div>
+    </div>
+
+    <div class="hero__foot">
+      <p class="hero__say" data-r>
+        Local culture, made contemporary.
+        <span>Designed in Amman, for people who grew up here.</span>
+      </p>
+      <p class="hero__cue"><i aria-hidden="true"></i> Scroll</p>
+    </div>
+  </section>
+
+  <!-- The brand's actual argument, in place of the manifesto nouns. -->
+  <section class="sec statement" data-r>
+    <p class="eyebrow">Who we are</p>
+    <h2 class="statement__big">Clothes that say where you are from, <em>without explaining it</em>.</h2>
+    <p class="lede">
+      A jamra is the last coal of a fire that never quite went out. That is the
+      whole idea: the parts of this place that survived, worn by someone in
+      their twenties without feeling like a costume.
+    </p>
+    <p class="lede">
+      <strong>We do not design anything a visitor would understand.</strong> The
+      generic pattern anyone can read does not get made. A saying you heard from
+      your grandmother does. The person who gets it feels seen — that is the
+      actual product.
+    </p>
+  </section>
+
+  <!-- Real pieces above the fold-ish, rather than three screens down. -->
+  <section class="sec pieces">
+    <div class="pieces__head">
+      <div data-r>
+        <p class="eyebrow">Selected</p>
+        <h2 class="h2">The pieces</h2>
+      </div>
+      <a class="btn-ghost" href="../store.html">See all 69</a>
+    </div>
+
+    <div class="grid">
+      <a class="card" href="../store.html" data-r>
+        <div class="card__shot">
+          <img class="base" src="../mockup/black back.webp" alt="" loading="lazy">
+          <img class="art" src="../products/7-001/7-001.webp" alt="7shm, back print on black" loading="lazy">
+        </div>
+        <p class="card__name">7shm</p>
+        <p class="card__price">12 JOD</p>
+      </a>
+
+      <a class="card" href="../store.html?category=special" data-r>
+        <div class="card__shot">
+          <img class="base" src="../mockup/black back.webp" alt="" loading="lazy">
+          <img class="art" src="../products/R-001/R-001.webp" alt="Red LD, back print on black" loading="lazy">
+        </div>
+        <p class="card__name">Red LD</p>
+        <p class="card__price">12 JOD</p>
+      </a>
+
+      <a class="card" href="../store.html?category=pride" data-r>
+        <div class="card__shot">
+          <img class="base" src="../mockup/white back.webp" alt="" loading="lazy">
+          <img class="art" src="../products/jo-004/jo-004.webp" alt="Amman, back print on white" loading="lazy">
+        </div>
+        <p class="card__name">Amman</p>
+        <p class="card__price">12 JOD</p>
+      </a>
+
+      <a class="card" href="../store.html?category=anime" data-r>
+        <div class="card__shot">
+          <img class="base" src="../mockup/white back.webp" alt="" loading="lazy">
+          <img class="art" src="../products/ani-002/ani-002.webp" alt="Luffy Gear 5, back print on white" loading="lazy">
+        </div>
+        <p class="card__name">Luffy Gear 5</p>
+        <p class="card__price">12 JOD</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- The four pillars and the two lines, grouped the way the store's own
+       filter bar groups them. -->
+  <section class="sec themes">
+    <div data-r>
+      <p class="eyebrow">Browse</p>
+      <h2 class="h2">By theme</h2>
+    </div>
+    <div class="themes__grid" data-r>
+      <a class="tile" href="../store.html?category=special">
+        <span class="tile__n">01</span>
+        <span class="tile__name">Special</span>
+        <span class="tile__note">The ones that do not fit a box.</span>
+      </a>
+      <a class="tile" href="../store.html?category=anime">
+        <span class="tile__n">02</span>
+        <span class="tile__name">Anime</span>
+        <span class="tile__note">Shirts and pieces, one subject.</span>
+      </a>
+      <a class="tile" href="../store.html?category=pride">
+        <span class="tile__n">03</span>
+        <span class="tile__name">Pride</span>
+        <span class="tile__note">Jordan, without the souvenir shop.</span>
+      </a>
+      <a class="tile" href="../store.html?category=gym">
+        <span class="tile__n">04</span>
+        <span class="tile__name">Gym</span>
+        <span class="tile__note">A cut, not a theme.</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="sec offer" data-r>
+    <div class="offer__row">
+      <span class="offer__n">16%</span>
+      <span class="offer__t">off three pieces or more</span>
+      <span class="offer__sep" aria-hidden="true"></span>
+      <span class="offer__n">16 JOD</span>
+      <span class="offer__t">any shirt with any accessory</span>
+    </div>
+  </section>
+
+  <section class="sec" data-r>
+    <p class="eyebrow">Wholesale</p>
+    <h2 class="h2">Order in bulk</h2>
+    <p class="lede">
+      Uniforms, team kits, event merch and staff wear. Tell us what you need and
+      we come back with a quote. Shops can carry a stand with nothing paid up front.
+    </p>
+    <p style="display:flex; gap:12px; flex-wrap:wrap; margin-top:26px">
+      <a class="btn-solid" href="../index.html#wholesale">Request a quote</a>
+      <a class="btn-ghost" href="../partners.html">Retail partners</a>
+    </p>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot__top">
+    <a class="bar__mark" href="#main" aria-label="Ember, home">
+      <img src="../images/Artboard-12_1.svg" alt="" width="22" height="36">
+      <span>Ember</span>
+    </a>
+    <div class="foot__links">
+      <a href="../store.html">Store</a>
+      <a href="../custom-design.html">Custom</a>
+      <a href="../partners.html">Partners</a>
+      <a href="../change-log.html">Events</a>
+      <a href="https://instagram.com/ember.jod">Instagram</a>
+      <a href="https://wa.me/962786213703">WhatsApp</a>
+    </div>
+  </div>
+  <div class="foot__fine">
+    <span>&copy; 2026 Ember Clothing &amp; Uniform</span>
+    <span>Amman, Jordan</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var sheet = document.getElementById("sheet");
+  var open  = document.getElementById("menu-open");
+  var close = document.getElementById("menu-close");
+
+  function setMenu(on) {
+    sheet.classList.toggle("is-open", on);
+    sheet.setAttribute("aria-hidden", on ? "false" : "true");
+    open.setAttribute("aria-expanded", on ? "true" : "false");
+    document.body.style.overflow = on ? "hidden" : "";
+    (on ? close : open).focus();
+  }
+
+  open.addEventListener("click", function () { setMenu(true); });
+  close.addEventListener("click", function () { setMenu(false); });
+  sheet.addEventListener("click", function (e) {
+    if (e.target.closest(".sheet__link")) setMenu(false);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && sheet.classList.contains("is-open")) setMenu(false);
+  });
+
+  // Reveal on scroll. Anything already in view on load is shown without
+  // animating, so the hero never fades in underneath the reader.
+  var items = document.querySelectorAll("[data-r]");
+  if (!("IntersectionObserver" in window)) {
+    items.forEach(function (el) { el.classList.add("in"); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+    });
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
+  items.forEach(function (el) { io.observe(el); });
+})();
+</script>
+
+</body>
+</html>

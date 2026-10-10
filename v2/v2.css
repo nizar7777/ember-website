@@ -1,0 +1,539 @@
+/* ---------------------------------------------------------------------
+   Ember v2 — a redesign proposal, served at /v2/ so it can be reviewed
+   beside the live site without touching it.
+
+   Same language as the current site: the existing colour roles, the same
+   type families, the same accent. What changes is the restraint. The
+   references the operator picked (Aevion/Riotters, Maison Kitsune, the
+   NOIR ATELIER and UNBORDERED studies, meermohsin.me) share one move —
+   near-black ground, a single accent, very little chrome, and enormous
+   room around one hero object. The current homepage does the opposite:
+   two diagonal marquees, a reviews badge and a gallery caption all land
+   before the first product.
+
+   Tokens are redeclared rather than imported so this folder is
+   self-contained and can be deleted or promoted in one move.
+--------------------------------------------------------------------- */
+
+:root {
+  --ground: #171310;
+  --raised: #1f1a15;
+  --hover: #2a211a;
+  --ink: #f2e9db;
+  --ink-muted: #b6a99a;
+  --ink-dim: #918475;
+  --accent: #ff4a1f;
+  --accent-hover: #ff6a45;
+  --hairline: #ffffff1a;
+  --hairline-strong: #ffffff33;
+
+  --display: "Humane", "Anton", Impact, sans-serif;
+  --sans: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --ease: cubic-bezier(.22, .61, .36, 1);
+  --dur: 240ms;
+
+  /* One gutter value everywhere, so nothing drifts out of alignment. */
+  --gutter: clamp(20px, 5vw, 72px);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ground), 0 0 0 4px var(--ink);
+  border-radius: 2px;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+.skip:focus {
+  left: var(--gutter);
+  top: 14px;
+  z-index: 100;
+  background: var(--accent);
+  color: var(--ground);
+  padding: 10px 16px;
+  border-radius: 4px;
+}
+
+/* --- chrome -----------------------------------------------------------
+   Aevion's whole navigation is a wordmark and the word "menu". That is
+   the lesson worth taking: the nav should not compete with the hero. The
+   current site paints six low-contrast links straight onto a busy photo,
+   which is why none of them are readable. */
+.bar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px var(--gutter);
+  /* A scrim rather than a solid bar, so the hero still reads edge to
+     edge but the links never sit directly on photography. */
+  background: linear-gradient(to bottom, #171310e6, #17131000);
+  backdrop-filter: blur(6px);
+}
+
+.bar__mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.bar__mark img { width: 22px; height: auto; display: block; }
+
+.bar__right { display: flex; align-items: center; gap: 8px; }
+
+.btn-ghost {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  padding: 10px 18px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.btn-ghost:hover { border-color: var(--ink); background: #ffffff0d; }
+
+.btn-solid {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ground);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 12px 22px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease);
+}
+.btn-solid:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+/* --- menu sheet ------------------------------------------------------- */
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--ground);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--gutter);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--dur) var(--ease), visibility 0s linear var(--dur);
+}
+.sheet.is-open { opacity: 1; visibility: visible; transition-delay: 0s; }
+
+.sheet__close {
+  position: absolute;
+  top: 18px;
+  right: var(--gutter);
+}
+
+.sheet__list { display: flex; flex-direction: column; gap: 2px; }
+
+.sheet__link {
+  font-family: var(--display);
+  font-size: clamp(3rem, 11vw, 7rem);
+  line-height: .92;
+  text-transform: uppercase;
+  color: var(--ink);
+  padding: 6px 0;
+  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.sheet__link:hover { color: var(--accent); transform: translateX(10px); }
+
+.sheet__meta {
+  margin-top: 36px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* --- hero -------------------------------------------------------------
+   One object, centred, with room around it, and the wordmark ghosted
+   behind at display scale. Copy is anchored to the bottom corners the
+   way Aevion does it, so the middle of the screen stays empty and the
+   garment is the only thing in it. */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  padding: 96px var(--gutter) 28px;
+  overflow: hidden;
+}
+
+/* The glow is the one atmospheric effect, borrowed from meermohsin.me:
+   a single warm source low behind the garment. An ember, not a spotlight. */
+.hero::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -28%;
+  width: min(190vw, 1200px);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  /* A long, soft falloff: tight stops band visibly on a narrow screen,
+     which showed up as a rectangle behind the hero copy on a phone. */
+  background: radial-gradient(circle closest-side,
+              #ff4a1f2b 0%, #ff4a1f1a 30%, #ff4a1f0a 52%, #ff4a1f05 70%, transparent 100%);
+  pointer-events: none;
+}
+
+.hero__word {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  transform: translate(-50%, -50%);
+  font-family: var(--display);
+  font-size: clamp(9rem, 34vw, 30rem);
+  line-height: .78;
+  /* Humane is extremely condensed - EMBER at 286px measured only 250px
+     wide, so it sat entirely behind the garment and may as well not have
+     been drawn. Tracked right out it spans the viewport and reads as
+     texture at the edges, which is the job. The left offset compensates
+     for the trailing space the last letter inherits. */
+  letter-spacing: .42em;
+  text-indent: .42em;
+  color: #f2e9db;
+  opacity: .11;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero__stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+}
+
+.hero__shot {
+  position: relative;
+  width: min(72vw, 420px);
+  aspect-ratio: 1433 / 1559;
+}
+.hero__shot img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.hero__shot img.base { object-fit: cover; }
+.hero__shot img.art  { object-fit: contain; }
+
+.hero__foot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.hero__say {
+  max-width: 34ch;
+  font-size: clamp(1rem, 2.4vw, 1.375rem);
+  line-height: 1.45;
+  color: var(--ink);
+}
+.hero__say span { color: var(--ink-dim); display: block; }
+
+.hero__cue {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hero__cue i {
+  width: 34px;
+  height: 1px;
+  background: var(--ink-dim);
+  display: block;
+  animation: cue 2.4s var(--ease) infinite;
+  transform-origin: left;
+}
+@keyframes cue {
+  0%, 100% { transform: scaleX(.3); opacity: .5; }
+  50%      { transform: scaleX(1);  opacity: 1; }
+}
+
+/* --- shared section furniture ----------------------------------------- */
+.sec { padding: clamp(72px, 12vw, 160px) var(--gutter); }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 18px;
+}
+
+.h2 {
+  font-family: var(--display);
+  font-size: clamp(2.75rem, 9vw, 7rem);
+  line-height: .9;
+  text-transform: uppercase;
+  margin: 0 0 24px;
+  letter-spacing: -.005em;
+}
+
+.lede {
+  max-width: 58ch;
+  font-size: clamp(1rem, 1.6vw, 1.1875rem);
+  line-height: 1.65;
+  color: var(--ink-muted);
+  margin: 0 0 18px;
+}
+.lede strong { color: var(--ink); font-weight: 500; }
+
+/* --- the statement ----------------------------------------------------
+   Replaces the "creativity, rebellion, identity / artists, outsiders and
+   dreamers" paragraph. That copy could belong to any label; this is the
+   brand's actual argument, in the voice the partners page already uses. */
+.statement { border-top: 1px solid var(--hairline); }
+
+.statement__big {
+  font-family: var(--display);
+  font-size: clamp(2.25rem, 7.5vw, 6rem);
+  line-height: .95;
+  text-transform: uppercase;
+  max-width: 18ch;
+  margin: 0 0 32px;
+}
+.statement__big em { font-style: normal; color: var(--accent); }
+
+/* --- pieces ----------------------------------------------------------- */
+.pieces { border-top: 1px solid var(--hairline); }
+
+.pieces__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: clamp(14px, 2vw, 26px);
+}
+
+.card { display: block; }
+
+.card__shot {
+  position: relative;
+  aspect-ratio: 1433 / 1559;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--raised);
+}
+.card__shot img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: transform var(--dur) var(--ease);
+}
+.card__shot img.base { object-fit: cover; }
+.card__shot img.art  { object-fit: contain; }
+.card:hover .card__shot img { transform: scale(1.03); }
+
+.card__name {
+  margin: 14px 0 2px;
+  font-size: 15px;
+  color: var(--ink);
+}
+.card__price {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .06em;
+  color: var(--accent);
+}
+
+/* --- themes -----------------------------------------------------------
+   The four pillars and the two product lines, set apart the same way the
+   store's own filter bar sets them apart. */
+.themes { border-top: 1px solid var(--hairline); }
+
+.themes__grid {
+  display: grid;
+  /* Two or four, never three: with four tiles a 3-up grid leaves one
+     empty cell, which reads as a broken layout rather than whitespace. */
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--hairline);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.tile {
+  background: var(--ground);
+  padding: clamp(22px, 3vw, 38px);
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  transition: background var(--dur) var(--ease);
+}
+.tile:hover { background: var(--raised); }
+
+.tile__n {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .16em;
+  color: var(--ink-dim);
+}
+.tile__name {
+  font-family: var(--display);
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  line-height: .9;
+  text-transform: uppercase;
+}
+.tile__note { font-size: 13px; color: var(--ink-muted); }
+.tile:hover .tile__name { color: var(--accent); }
+
+/* --- offer ------------------------------------------------------------ */
+.offer {
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
+.offer__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 4vw, 56px);
+  flex-wrap: wrap;
+  text-align: center;
+}
+.offer__n {
+  font-family: var(--display);
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  line-height: .9;
+  color: var(--accent);
+}
+.offer__t { font-size: 14px; color: var(--ink-muted); max-width: 18ch; text-align: left; }
+.offer__sep { width: 1px; align-self: stretch; min-height: 54px; background: var(--hairline-strong); }
+
+/* --- foot ------------------------------------------------------------- */
+.foot {
+  padding: clamp(48px, 7vw, 90px) var(--gutter) 40px;
+  display: grid;
+  gap: 36px;
+}
+.foot__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.foot__links { display: flex; gap: 22px; flex-wrap: wrap; }
+.foot__links a {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  transition: color var(--dur) var(--ease);
+}
+.foot__links a:hover { color: var(--accent); }
+.foot__fine {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--ink-dim);
+  border-top: 1px solid var(--hairline);
+  padding-top: 22px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* --- reveal on scroll -------------------------------------------------
+   Opacity and a short lift only. Nothing slides in from the side; the
+   references are all calm, and movement that large is what dates a page. */
+[data-r] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 620ms var(--ease), transform 620ms var(--ease);
+}
+[data-r].in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-r] { opacity: 1; transform: none; }
+  .hero__cue i { animation: none; }
+}
+
+@media (min-width: 1000px) {
+  .themes__grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 640px) {
+  /* Stack, but keep the scroll cue last - putting it above the copy read
+     as a stray label rather than a cue to keep going. */
+  .hero__foot { align-items: flex-start; flex-direction: column; gap: 18px; }
+  .hero__say { max-width: none; }
+  .offer__sep { display: none; }
+  .offer__t { text-align: center; }
+}
