@@ -1,18 +1,28 @@
 /* ---------------------------------------------------------------------
-   Ember v2 — a redesign proposal, served at /v2/ so it can be reviewed
-   beside the live site without touching it.
+   Ember v2 — second pass.
 
-   Same language as the current site: the existing colour roles, the same
-   type families, the same accent. What changes is the restraint. The
-   references the operator picked (Aevion/Riotters, Maison Kitsune, the
-   NOIR ATELIER and UNBORDERED studies, meermohsin.me) share one move —
-   near-black ground, a single accent, very little chrome, and enormous
-   room around one hero object. The current homepage does the opposite:
-   two diagonal marquees, a reviews badge and a gallery caption all land
-   before the first product.
+   Keeps the brand's own language (the existing colour roles, Humane for
+   display, IBM Plex for everything else, the single orange accent) and
+   borrows the DEVICES from the references rather than only their
+   emptiness:
 
-   Tokens are redeclared rather than imported so this folder is
-   self-contained and can be deleted or promoted in one move.
+     Aevion / Riotters   pinned hero, ghosted wordmark, a spec marquee,
+                         numbered sections, scroll-driven motion
+     meermohsin.me       near-black ground, warm glow, custom cursor,
+                         staggered reveals
+     Maison Kitsune      hover image swap on product cards
+     NOIR / UNBORDERED   editorial split layouts, type as graphic
+
+   The first pass stripped the page out but put nothing back, so it read
+   as empty rather than restrained. It also led on a catalogue packshot
+   while four real lifestyle photographs sat unused.
+
+   Design rules held throughout:
+     spacing   a 4px base scale, nothing off-grid
+     type      one ratio, display / heading / body / micro, no in-betweens
+     colour    one accent, used for emphasis only, never for decoration
+     radius    4px controls, 10px cards, 999px pills - three values only
+     motion    opacity + small translate, one easing curve, one duration
 --------------------------------------------------------------------- */
 
 :root {
@@ -27,28 +37,32 @@
   --hairline: #ffffff1a;
   --hairline-strong: #ffffff33;
 
+  /* Two display faces, each at the size it actually works at:
+     Humane only for the hero statement and the ghosted wordmark, where its
+     extreme condensation is the point; Anton for every heading, tile and
+     numeral, where Humane collapses into unreadable verticals. */
   --display: "Humane", "Anton", Impact, sans-serif;
+  --display-2: "Anton", "Bebas Neue", Impact, sans-serif;
   --sans: "IBM Plex Sans", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
 
+  /* One curve, three durations. Everything on the page uses these. */
   --ease: cubic-bezier(.22, .61, .36, 1);
-  --dur: 240ms;
+  --t-fast: 180ms;
+  --t: 320ms;
+  --t-slow: 720ms;
 
-  /* One gutter value everywhere, so nothing drifts out of alignment. */
+  /* 4px base. Every margin and pad below is a multiple. */
+  --s1: 4px;  --s2: 8px;   --s3: 12px; --s4: 16px;
+  --s5: 24px; --s6: 32px;  --s7: 48px; --s8: 64px;
+  --s9: 96px; --s10: 128px;
+
   --gutter: clamp(20px, 5vw, 72px);
+  --maxw: 1440px;
 }
 
 * { box-sizing: border-box; }
-
 html { scroll-behavior: smooth; }
-
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation-duration: .01ms !important;
-    transition-duration: .01ms !important;
-  }
-}
 
 body {
   margin: 0;
@@ -62,32 +76,83 @@ body {
 }
 
 a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
 
 :focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--ground), 0 0 0 4px var(--ink);
-  border-radius: 2px;
+  border-radius: var(--s1);
 }
 
-.skip {
-  position: absolute;
-  left: -9999px;
-}
+.skip { position: absolute; left: -9999px; }
 .skip:focus {
-  left: var(--gutter);
-  top: 14px;
-  z-index: 100;
-  background: var(--accent);
-  color: var(--ground);
-  padding: 10px 16px;
-  border-radius: 4px;
+  left: var(--gutter); top: 14px; z-index: 100;
+  background: var(--accent); color: var(--ground);
+  padding: 10px 16px; border-radius: var(--s1);
 }
 
-/* --- chrome -----------------------------------------------------------
-   Aevion's whole navigation is a wordmark and the word "menu". That is
-   the lesson worth taking: the nav should not compete with the hero. The
-   current site paints six low-contrast links straight onto a busy photo,
-   which is why none of them are readable. */
+/* --- type scale -------------------------------------------------------
+   Four steps, no improvised sizes in between. */
+.t-display {
+  font-family: var(--display);
+  font-size: clamp(4rem, 15vw, 13rem);
+  line-height: .84;
+  text-transform: uppercase;
+  letter-spacing: -.005em;
+  margin: 0;
+}
+.t-head {
+  font-family: var(--display-2);
+  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+  line-height: .96;
+  text-transform: uppercase;
+  letter-spacing: .005em;
+  text-wrap: balance;
+  margin: 0;
+}
+.t-body { font-size: clamp(1rem, 1.5vw, 1.125rem); line-height: 1.65; margin: 0; }
+.t-micro {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.muted { color: var(--ink-muted); }
+.dim   { color: var(--ink-dim); }
+.accent { color: var(--accent); }
+
+/* --- custom cursor (desktop, fine pointer only) ----------------------
+   meermohsin.me's dot-and-ring. Hidden entirely on touch, where it would
+   be a permanently stranded dot. */
+.cursor, .cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 200;
+  border-radius: 999px;
+  opacity: 0;
+  transition: opacity var(--t) var(--ease);
+}
+.cursor { width: 6px; height: 6px; background: var(--accent); margin: -3px 0 0 -3px; }
+.cursor-ring {
+  width: 34px; height: 34px;
+  border: 1px solid var(--hairline-strong);
+  margin: -17px 0 0 -17px;
+  transition: opacity var(--t) var(--ease), width var(--t) var(--ease),
+              height var(--t) var(--ease), margin var(--t) var(--ease),
+              border-color var(--t) var(--ease);
+}
+.cursor-ring.is-big {
+  width: 64px; height: 64px; margin: -32px 0 0 -32px;
+  border-color: var(--accent);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cursor.is-live, .cursor-ring.is-live { opacity: 1; }
+}
+
+/* --- chrome ----------------------------------------------------------- */
 .bar {
   position: fixed;
   inset: 0 0 auto 0;
@@ -95,288 +160,185 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px var(--gutter);
-  /* A scrim rather than a solid bar, so the hero still reads edge to
-     edge but the links never sit directly on photography. */
-  background: linear-gradient(to bottom, #171310e6, #17131000);
-  backdrop-filter: blur(6px);
+  padding: var(--s4) var(--gutter);
+  background: linear-gradient(to bottom, #171310f2, #17131000);
+  backdrop-filter: blur(8px);
+  transition: transform var(--t) var(--ease);
 }
+.bar.is-hidden { transform: translateY(-110%); }
 
 .bar__mark {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--ink);
+  display: flex; align-items: center; gap: var(--s2);
+  font-family: var(--mono); font-size: 12px;
+  letter-spacing: .18em; text-transform: uppercase;
 }
-.bar__mark img { width: 22px; height: auto; display: block; }
+.bar__mark img { width: 22px; }
+.bar__right { display: flex; align-items: center; gap: var(--s2); }
 
-.bar__right { display: flex; align-items: center; gap: 8px; }
-
-.btn-ghost {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--ink);
-  background: transparent;
-  border: 1px solid var(--hairline-strong);
+.btn {
+  font-family: var(--mono); font-size: 12px;
+  letter-spacing: .14em; text-transform: uppercase;
   border-radius: 999px;
-  padding: 10px 18px;
+  padding: var(--s3) var(--s5);
   min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  display: inline-flex; align-items: center; gap: var(--s2);
   cursor: pointer;
-  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  transition: background var(--t) var(--ease), border-color var(--t) var(--ease), color var(--t) var(--ease);
 }
-.btn-ghost:hover { border-color: var(--ink); background: #ffffff0d; }
-
-.btn-solid {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--ground);
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  padding: 12px 22px;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-  transition: background var(--dur) var(--ease);
-}
-.btn-solid:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn--ghost { color: var(--ink); background: transparent; border: 1px solid var(--hairline-strong); }
+.btn--ghost:hover { border-color: var(--ink); background: #ffffff0d; }
+.btn--solid { color: var(--ground); background: var(--accent); border: 1px solid var(--accent); }
+.btn--solid:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
 /* --- menu sheet ------------------------------------------------------- */
 .sheet {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
+  position: fixed; inset: 0; z-index: 60;
   background: var(--ground);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: flex; flex-direction: column; justify-content: center;
   padding: var(--gutter);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity var(--dur) var(--ease), visibility 0s linear var(--dur);
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--t) var(--ease), visibility 0s linear var(--t);
 }
 .sheet.is-open { opacity: 1; visibility: visible; transition-delay: 0s; }
-
-.sheet__close {
-  position: absolute;
-  top: 18px;
-  right: var(--gutter);
-}
-
-.sheet__list { display: flex; flex-direction: column; gap: 2px; }
-
+.sheet__close { position: absolute; top: var(--s4); right: var(--gutter); }
+.sheet__list { display: flex; flex-direction: column; }
 .sheet__link {
-  font-family: var(--display);
-  font-size: clamp(3rem, 11vw, 7rem);
-  line-height: .92;
+  font-family: var(--display-2);
+  font-size: clamp(2rem, 7vw, 4rem);
+  line-height: 1;
   text-transform: uppercase;
-  color: var(--ink);
-  padding: 6px 0;
-  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease);
+  padding: var(--s1) 0;
+  display: flex; align-items: baseline; gap: var(--s4);
+  transition: color var(--t) var(--ease), transform var(--t) var(--ease);
 }
-.sheet__link:hover { color: var(--accent); transform: translateX(10px); }
-
-.sheet__meta {
-  margin-top: 36px;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--ink-dim);
-}
+.sheet__link span { font-family: var(--mono); font-size: 11px; color: var(--ink-dim); }
+.sheet__link:hover { color: var(--accent); transform: translateX(var(--s3)); }
+.sheet__meta { margin-top: var(--s7); }
 
 /* --- hero -------------------------------------------------------------
-   One object, centred, with room around it, and the wordmark ghosted
-   behind at display scale. Copy is anchored to the bottom corners the
-   way Aevion does it, so the middle of the screen stays empty and the
-   garment is the only thing in it. */
-.hero {
-  position: relative;
-  min-height: 100svh;
+   Pinned: the photograph holds while the headline and the scrim move over
+   it, which is the Aevion scroll behaviour. The photo is one of the real
+   lifestyle shots, not a packshot - that was the first pass's mistake. */
+.hero { position: relative; height: 100svh; overflow: clip; }
+
+.hero__pin {
+  position: sticky; top: 0;
+  height: 100svh;
   display: grid;
   grid-template-rows: 1fr auto;
-  padding: 96px var(--gutter) 28px;
+  padding: calc(var(--s10) - var(--s2)) var(--gutter) var(--s7);
   overflow: hidden;
 }
 
-/* The glow is the one atmospheric effect, borrowed from meermohsin.me:
-   a single warm source low behind the garment. An ember, not a spotlight. */
-.hero::before {
+.hero__bg { position: absolute; inset: 0; z-index: -2; }
+.hero__bg img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 50% 42%;
+  /* Scroll drives this. Set here so there is no jump before JS runs. */
+  transform: scale(1.06);
+}
+/* Two scrims: one to seat the type, one warm one for the ember glow. */
+.hero__bg::after {
   content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -28%;
-  width: min(190vw, 1200px);
-  aspect-ratio: 1;
-  transform: translateX(-50%);
-  /* A long, soft falloff: tight stops band visibly on a narrow screen,
-     which showed up as a rectangle behind the hero copy on a phone. */
-  background: radial-gradient(circle closest-side,
-              #ff4a1f2b 0%, #ff4a1f1a 30%, #ff4a1f0a 52%, #ff4a1f05 70%, transparent 100%);
-  pointer-events: none;
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to bottom, #171310cc 0%, #17131059 38%, #171310e6 88%, var(--ground) 100%),
+    radial-gradient(120% 70% at 50% 108%, #ff4a1f2e 0%, #ff4a1f0f 42%, transparent 72%);
 }
 
 .hero__word {
   position: absolute;
-  left: 50%;
-  top: 38%;
+  left: 50%; top: 34%;
   transform: translate(-50%, -50%);
+  z-index: -1;
   font-family: var(--display);
-  font-size: clamp(9rem, 34vw, 30rem);
+  font-size: clamp(9rem, 32vw, 28rem);
   line-height: .78;
-  /* Humane is extremely condensed - EMBER at 286px measured only 250px
-     wide, so it sat entirely behind the garment and may as well not have
-     been drawn. Tracked right out it spans the viewport and reads as
-     texture at the edges, which is the job. The left offset compensates
-     for the trailing space the last letter inherits. */
-  letter-spacing: .42em;
-  text-indent: .42em;
-  color: #f2e9db;
-  opacity: .11;
+  /* Humane is narrow enough that EMBER sets only ~0.9em per character;
+     tracked out it spans the viewport and reads as texture at the edges
+     instead of hiding behind the subject. */
+  letter-spacing: .4em;
+  text-indent: .4em;
+  color: var(--ink);
+  opacity: .09;
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
 }
 
-.hero__stage {
-  position: relative;
-  display: grid;
-  place-items: center;
-  min-height: 0;
-}
-
-.hero__shot {
-  position: relative;
-  width: min(72vw, 420px);
-  aspect-ratio: 1433 / 1559;
-}
-.hero__shot img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-.hero__shot img.base { object-fit: cover; }
-.hero__shot img.art  { object-fit: contain; }
+.hero__copy { align-self: end; max-width: 20ch; }
+.hero__copy .t-display { margin-bottom: var(--s4); }
 
 .hero__foot {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: var(--s5); flex-wrap: wrap;
+  padding-top: var(--s6);
 }
+.hero__sub { max-width: 34ch; }
 
-.hero__say {
-  max-width: 34ch;
-  font-size: clamp(1rem, 2.4vw, 1.375rem);
-  line-height: 1.45;
-  color: var(--ink);
-}
-.hero__say span { color: var(--ink-dim); display: block; }
-
-.hero__cue {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--ink-dim);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.hero__cue i {
-  width: 34px;
-  height: 1px;
-  background: var(--ink-dim);
-  display: block;
-  animation: cue 2.4s var(--ease) infinite;
+.cue { display: flex; align-items: center; gap: var(--s3); }
+.cue i {
+  width: 36px; height: 1px; background: var(--ink-dim); display: block;
   transform-origin: left;
+  animation: cue 2.4s var(--ease) infinite;
 }
-@keyframes cue {
-  0%, 100% { transform: scaleX(.3); opacity: .5; }
-  50%      { transform: scaleX(1);  opacity: 1; }
+@keyframes cue { 0%,100% { transform: scaleX(.25); opacity: .45 } 50% { transform: scaleX(1); opacity: 1 } }
+
+/* --- marquee ----------------------------------------------------------
+   One horizontal strip, mono, hairline-bounded. The live site's two
+   overlapping diagonal slabs were the loudest thing on the page; this is
+   the same device used quietly. */
+.marquee {
+  border-block: 1px solid var(--hairline);
+  overflow: hidden;
+  padding: var(--s4) 0;
+  background: var(--raised);
 }
-
-/* --- shared section furniture ----------------------------------------- */
-.sec { padding: clamp(72px, 12vw, 160px) var(--gutter); }
-
-.eyebrow {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin: 0 0 18px;
+.marquee__track {
+  display: flex; gap: var(--s8);
+  width: max-content;
+  animation: slide 42s linear infinite;
 }
-
-.h2 {
-  font-family: var(--display);
-  font-size: clamp(2.75rem, 9vw, 7rem);
-  line-height: .9;
-  text-transform: uppercase;
-  margin: 0 0 24px;
-  letter-spacing: -.005em;
-}
-
-.lede {
-  max-width: 58ch;
-  font-size: clamp(1rem, 1.6vw, 1.1875rem);
-  line-height: 1.65;
+.marquee:hover .marquee__track { animation-play-state: paused; }
+.marquee__track span {
+  font-family: var(--mono); font-size: 12px;
+  letter-spacing: .22em; text-transform: uppercase;
   color: var(--ink-muted);
-  margin: 0 0 18px;
+  display: flex; align-items: center; gap: var(--s8);
+  white-space: nowrap;
 }
-.lede strong { color: var(--ink); font-weight: 500; }
+.marquee__track span::after { content: "\25C6"; color: var(--accent); font-size: 8px; }
+@keyframes slide { to { transform: translateX(-50%) } }
 
-/* --- the statement ----------------------------------------------------
-   Replaces the "creativity, rebellion, identity / artists, outsiders and
-   dreamers" paragraph. That copy could belong to any label; this is the
-   brand's actual argument, in the voice the partners page already uses. */
-.statement { border-top: 1px solid var(--hairline); }
+/* --- section furniture ------------------------------------------------ */
+.sec { padding: clamp(72px, 11vw, 150px) var(--gutter); max-width: var(--maxw); margin-inline: auto; }
+.sec--line { border-top: 1px solid var(--hairline); }
 
-.statement__big {
-  font-family: var(--display);
-  font-size: clamp(2.25rem, 7.5vw, 6rem);
-  line-height: .95;
-  text-transform: uppercase;
-  max-width: 18ch;
-  margin: 0 0 32px;
+.sec__head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: var(--s5); flex-wrap: wrap;
+  margin-bottom: var(--s8);
 }
+.sec__n { display: flex; align-items: baseline; gap: var(--s3); margin-bottom: var(--s4); }
+.sec__n b { font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 400; }
+
+/* --- statement -------------------------------------------------------- */
+.statement__big { max-width: 17ch; margin-bottom: var(--s6); }
 .statement__big em { font-style: normal; color: var(--accent); }
-
-/* --- pieces ----------------------------------------------------------- */
-.pieces { border-top: 1px solid var(--hairline); }
-
-.pieces__head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 40px;
+.statement__cols {
+  display: grid; gap: var(--s6);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  max-width: 980px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: clamp(14px, 2vw, 26px);
-}
-
-.card { display: block; }
+/* --- product grid ----------------------------------------------------
+   Hover swaps front for back, the way Maison Kitsune swaps the packshot
+   for the model shot. Ember has both mockups for every colour already,
+   so this costs nothing and is genuinely useful - these are back prints,
+   and the back is what the customer actually wants to see. */
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(12px, 2vw, 24px); }
+@media (min-width: 900px) { .grid { grid-template-columns: repeat(4, 1fr); } }
 
 .card__shot {
   position: relative;
@@ -385,39 +347,43 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden;
   background: var(--raised);
 }
-.card__shot img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  transition: transform var(--dur) var(--ease);
-}
-.card__shot img.base { object-fit: cover; }
-.card__shot img.art  { object-fit: contain; }
-.card:hover .card__shot img { transform: scale(1.03); }
+.card__face { position: absolute; inset: 0; transition: opacity var(--t) var(--ease); }
+.card__face img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.card__face img.base { object-fit: cover; }
+.card__face img.art  { object-fit: contain; }
+.card__face--front { opacity: 0; }
+.card:hover .card__face--front { opacity: 1; }
+.card:hover .card__face--back  { opacity: 0; }
 
-.card__name {
-  margin: 14px 0 2px;
-  font-size: 15px;
-  color: var(--ink);
-}
-.card__price {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: .06em;
-  color: var(--accent);
-}
 
-/* --- themes -----------------------------------------------------------
-   The four pillars and the two product lines, set apart the same way the
-   store's own filter bar sets them apart. */
-.themes { border-top: 1px solid var(--hairline); }
+.grid__hint { display: none; margin-top: var(--s3); }
+@media (hover: hover) and (pointer: fine) { .grid__hint { display: block; } }
 
-.themes__grid {
+.card__meta { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); margin-top: var(--s3); }
+.card__name { font-size: 15px; }
+.card__price { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+
+/* --- editorial split --------------------------------------------------
+   Big photograph against a short argument. The reveal is a clip-path
+   wipe rather than a fade, which is the one place the references all
+   agree a transition is worth noticing. */
+.split {
   display: grid;
-  /* Two or four, never three: with four tiles a 3-up grid leaves one
-     empty cell, which reads as a broken layout rather than whitespace. */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(24px, 5vw, 80px);
+  align-items: center;
+}
+.split--flip .split__media { order: 2; }
+
+.split__media { border-radius: 10px; overflow: hidden; background: var(--raised); }
+.split__media img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+
+.wipe { clip-path: inset(0 0 100% 0); transition: clip-path 900ms var(--ease); }
+.wipe.in { clip-path: inset(0 0 0 0); }
+
+/* --- themes ----------------------------------------------------------- */
+.tiles {
+  display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1px;
   background: var(--hairline);
@@ -425,115 +391,83 @@ a { color: inherit; text-decoration: none; }
   border-radius: 12px;
   overflow: hidden;
 }
+@media (min-width: 1000px) { .tiles { grid-template-columns: repeat(4, 1fr); } }
 
 .tile {
+  position: relative;
   background: var(--ground);
-  padding: clamp(22px, 3vw, 38px);
-  min-height: 190px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 18px;
-  transition: background var(--dur) var(--ease);
+  padding: clamp(20px, 2.6vw, 36px);
+  min-height: 200px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: var(--s4);
+  overflow: hidden;
+  transition: background var(--t) var(--ease);
 }
 .tile:hover { background: var(--raised); }
-
-.tile__n {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: .16em;
-  color: var(--ink-dim);
-}
-.tile__name {
-  font-family: var(--display);
-  font-size: clamp(2rem, 4.5vw, 3.25rem);
-  line-height: .9;
-  text-transform: uppercase;
-}
-.tile__note { font-size: 13px; color: var(--ink-muted); }
+.tile__name { font-family: var(--display-2); font-size: clamp(1.75rem, 3vw, 2.5rem); line-height: .9; text-transform: uppercase; transition: color var(--t) var(--ease); }
 .tile:hover .tile__name { color: var(--accent); }
-
-/* --- offer ------------------------------------------------------------ */
-.offer {
-  border-top: 1px solid var(--hairline);
-  border-bottom: 1px solid var(--hairline);
+.tile__note { font-size: 13px; color: var(--ink-muted); }
+/* A hairline that draws itself in from the left on hover. */
+.tile::after {
+  content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 100%;
+  background: var(--accent);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform var(--t) var(--ease);
 }
+.tile:hover::after { transform: scaleX(1); }
+
+/* --- offer band ------------------------------------------------------- */
+.offer { border-block: 1px solid var(--hairline); background: var(--raised); }
 .offer__row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(16px, 4vw, 56px);
-  flex-wrap: wrap;
-  text-align: center;
+  display: flex; align-items: center; justify-content: center;
+  gap: clamp(16px, 4vw, 64px); flex-wrap: wrap;
 }
-.offer__n {
-  font-family: var(--display);
-  font-size: clamp(2.5rem, 7vw, 5rem);
-  line-height: .9;
-  color: var(--accent);
-}
-.offer__t { font-size: 14px; color: var(--ink-muted); max-width: 18ch; text-align: left; }
-.offer__sep { width: 1px; align-self: stretch; min-height: 54px; background: var(--hairline-strong); }
+.offer__item { display: flex; align-items: center; gap: var(--s4); }
+.offer__n { font-family: var(--display-2); font-size: clamp(2rem, 4.5vw, 3.25rem); line-height: 1; color: var(--accent); }
+.offer__t { font-size: 14px; color: var(--ink-muted); max-width: 22ch; text-wrap: balance; }
+.offer__sep { width: 1px; align-self: stretch; min-height: 56px; background: var(--hairline-strong); }
 
-/* --- foot ------------------------------------------------------------- */
-.foot {
-  padding: clamp(48px, 7vw, 90px) var(--gutter) 40px;
-  display: grid;
-  gap: 36px;
-}
-.foot__top {
-  display: flex;
-  justify-content: space-between;
-  gap: 28px;
-  flex-wrap: wrap;
-}
-.foot__links { display: flex; gap: 22px; flex-wrap: wrap; }
-.foot__links a {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  transition: color var(--dur) var(--ease);
-}
+/* --- footer ----------------------------------------------------------- */
+.foot { padding: clamp(48px, 7vw, 88px) var(--gutter) var(--s7); border-top: 1px solid var(--hairline); }
+.foot__top { display: flex; justify-content: space-between; gap: var(--s6); flex-wrap: wrap; margin-bottom: var(--s7); }
+.foot__links { display: flex; gap: var(--s5); flex-wrap: wrap; }
+.foot__links a { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted); transition: color var(--t) var(--ease); }
 .foot__links a:hover { color: var(--accent); }
-.foot__fine {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: .08em;
-  color: var(--ink-dim);
-  border-top: 1px solid var(--hairline);
-  padding-top: 22px;
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
+.foot__fine { border-top: 1px solid var(--hairline); padding-top: var(--s5); display: flex; justify-content: space-between; gap: var(--s4); flex-wrap: wrap; }
 
-/* --- reveal on scroll -------------------------------------------------
-   Opacity and a short lift only. Nothing slides in from the side; the
-   references are all calm, and movement that large is what dates a page. */
-[data-r] {
-  opacity: 0;
-  transform: translateY(14px);
-  transition: opacity 620ms var(--ease), transform 620ms var(--ease);
+/* --- reveals ----------------------------------------------------------
+   Words rise in sequence. Each word is wrapped by JS so the stagger is a
+   delay on a child, not a separate animation per element. */
+.r-word {
+  display: inline-block; overflow: hidden; vertical-align: top;
+  /* The clip box has to sit a hair below the baseline or commas lose their tail. */
+  padding-bottom: .09em; margin-bottom: -.09em;
 }
+.r-word > i {
+  display: inline-block; font-style: inherit;
+  transform: translateY(104%);
+  transition: transform var(--t-slow) var(--ease);
+}
+.in .r-word > i, .r-word.in > i { transform: none; }
+
+[data-r] { opacity: 0; transform: translateY(16px); transition: opacity var(--t-slow) var(--ease), transform var(--t-slow) var(--ease); }
 [data-r].in { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-r] { opacity: 1; transform: none; }
-  .hero__cue i { animation: none; }
-}
-
-@media (min-width: 1000px) {
-  .themes__grid { grid-template-columns: repeat(4, 1fr); }
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  [data-r], .wipe { opacity: 1; transform: none; clip-path: none; }
+  .r-word > i { transform: none; }
+  .cursor, .cursor-ring { display: none; }
 }
 
 @media (max-width: 640px) {
-  /* Stack, but keep the scroll cue last - putting it above the copy read
-     as a stray label rather than a cue to keep going. */
-  .hero__foot { align-items: flex-start; flex-direction: column; gap: 18px; }
-  .hero__say { max-width: none; }
+  .hero__pin { padding-top: var(--s9); }
+  .hero__foot { flex-direction: column; align-items: flex-start; gap: var(--s5); }
+  /* Humane sets so narrow that the shared 15vw step left the whole headline
+     occupying under half the width of a phone - a caption, not a statement.
+     Phones get their own step rather than a wider clamp, which would have
+     blown the heading up on every mid-size window too. */
+  .t-display { font-size: 26vw; }
   .offer__sep { display: none; }
-  .offer__t { text-align: center; }
+  .split--flip .split__media { order: 0; }
 }

@@ -5,7 +5,7 @@
   <title>Ember — Clothing &amp; Uniform, Amman</title>
   <meta name="description" content="Local culture, made contemporary. Streetwear and uniform from Amman.">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Review build. Kept out of search until it is promoted to the root. -->
+  <!-- Review build. Stays out of search until it is promoted to the root. -->
   <meta name="robots" content="noindex, nofollow">
   <meta property="og:title" content="Ember — Clothing &amp; Uniform, Amman">
   <meta property="og:description" content="Local culture, made contemporary. Streetwear and uniform from Amman.">
@@ -16,12 +16,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
   <link rel="preload" href="../fonts/Humane-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" as="image" href="../images/team-02.webp" fetchpriority="high">
   <style>
-    @font-face {
-      font-family: "Humane";
-      src: url("../fonts/Humane-Regular.woff2") format("woff2");
-      font-display: swap;
-    }
+    @font-face { font-family: "Humane"; src: url("../fonts/Humane-Regular.woff2") format("woff2"); font-display: swap; }
   </style>
   <link rel="stylesheet" href="v2.css">
 </head>
@@ -29,172 +26,232 @@
 
 <a class="skip" href="#main">Skip to content</a>
 
-<header class="bar">
+<div class="cursor" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
+
+<header class="bar" id="bar">
   <a class="bar__mark" href="#main" aria-label="Ember, home">
     <img src="../images/Artboard-12_1.svg" alt="" width="22" height="36">
     <span>Ember</span>
   </a>
   <div class="bar__right">
-    <a class="btn-ghost" href="../store.html">Store</a>
-    <button type="button" class="btn-ghost" id="menu-open" aria-expanded="false" aria-controls="sheet">Menu</button>
+    <a class="btn btn--ghost" href="../store.html">Store</a>
+    <button type="button" class="btn btn--ghost" id="menu-open" aria-expanded="false" aria-controls="sheet">Menu</button>
   </div>
 </header>
 
-<!-- Full-screen menu instead of six links painted onto the hero photo.
-     It is the one piece of chrome, and it gets out of the way again. -->
 <nav class="sheet" id="sheet" aria-label="Main" aria-hidden="true">
-  <button type="button" class="btn-ghost sheet__close" id="menu-close">Close</button>
+  <button type="button" class="btn btn--ghost sheet__close" id="menu-close">Close</button>
   <div class="sheet__list">
-    <a class="sheet__link" href="../store.html">Store</a>
-    <a class="sheet__link" href="../store.html?category=merch">Merch</a>
-    <a class="sheet__link" href="../store.html?category=uniform">Uniform</a>
-    <a class="sheet__link" href="../custom-design.html">Custom</a>
-    <a class="sheet__link" href="../partners.html">Retail partners</a>
-    <a class="sheet__link" href="../change-log.html">Events</a>
+    <a class="sheet__link" href="../store.html"><span>01</span> Store</a>
+    <a class="sheet__link" href="../store.html?category=merch"><span>02</span> Merch</a>
+    <a class="sheet__link" href="../store.html?category=uniform"><span>03</span> Uniform</a>
+    <a class="sheet__link" href="../custom-design.html"><span>04</span> Custom</a>
+    <a class="sheet__link" href="../partners.html"><span>05</span> Partners</a>
+    <a class="sheet__link" href="../change-log.html"><span>06</span> Events</a>
   </div>
-  <p class="sheet__meta">Amman, Jordan &middot; 078 621 3703</p>
+  <p class="t-micro dim sheet__meta">Amman, Jordan &middot; 078 621 3703 &middot; @ember.jod</p>
 </nav>
 
 <main id="main" tabindex="-1">
 
-  <!-- Hero: one garment, centred, with the wordmark ghosted behind it.
-       The middle of the screen stays empty on purpose. -->
+  <!-- Hero: real photography, pinned, with the wordmark ghosted behind
+       and the headline rising in word by word. -->
   <section class="hero">
-    <div class="hero__word" aria-hidden="true">EMBER</div>
+    <div class="hero__pin">
+      <div class="hero__bg"><img id="hero-img" src="../images/team-02.webp" alt="Ember tee worn under a concrete overpass in Amman" fetchpriority="high"></div>
+      <div class="hero__word" aria-hidden="true">EMBER</div>
 
-    <div class="hero__stage">
-      <div class="hero__shot" data-r>
-        <img class="base" src="../mockup/black back.webp" alt="" loading="eager" fetchpriority="high">
-        <img class="art" src="../products/7-001/7-001.webp" alt="The 7shm tee, printed on black" loading="eager" fetchpriority="high">
+      <div class="hero__copy">
+        <h1 class="t-display" data-split>Worn where you are from</h1>
+      </div>
+
+      <div class="hero__foot">
+        <p class="t-body muted hero__sub" data-r>
+          Local culture, made contemporary. Designed in Amman, for people who grew up here.
+        </p>
+        <p class="t-micro dim cue"><i aria-hidden="true"></i> Scroll</p>
       </div>
     </div>
+  </section>
 
-    <div class="hero__foot">
-      <p class="hero__say" data-r>
-        Local culture, made contemporary.
-        <span>Designed in Amman, for people who grew up here.</span>
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track" id="marquee">
+      <span>69 pieces</span><span>Oversize cut</span><span>Vintage wash</span>
+      <span>Printed in Amman</span><span>16% off three or more</span><span>Shirt + accessory 16 JOD</span>
+    </div>
+  </div>
+
+  <!-- The brand's argument, in the partners-page voice. -->
+  <section class="sec sec--line">
+    <div class="sec__n" data-r><b>01</b><span class="t-micro dim">Who we are</span></div>
+    <h2 class="t-head statement__big" data-split>Clothes that say where you are from, <em>without explaining it</em></h2>
+    <div class="statement__cols">
+      <p class="t-body muted" data-r>
+        A jamra is the last coal of a fire that never quite went out. That is the
+        whole idea — the parts of this place that survived, worn by someone in
+        their twenties without feeling like a costume.
       </p>
-      <p class="hero__cue"><i aria-hidden="true"></i> Scroll</p>
+      <p class="t-body muted" data-r>
+        We do not design anything a visitor would understand. The generic pattern
+        anyone can read does not get made. A saying you heard from your grandmother
+        does. The person who gets it feels seen — that is the actual product.
+      </p>
     </div>
   </section>
 
-  <!-- The brand's actual argument, in place of the manifesto nouns. -->
-  <section class="sec statement" data-r>
-    <p class="eyebrow">Who we are</p>
-    <h2 class="statement__big">Clothes that say where you are from, <em>without explaining it</em>.</h2>
-    <p class="lede">
-      A jamra is the last coal of a fire that never quite went out. That is the
-      whole idea: the parts of this place that survived, worn by someone in
-      their twenties without feeling like a costume.
-    </p>
-    <p class="lede">
-      <strong>We do not design anything a visitor would understand.</strong> The
-      generic pattern anyone can read does not get made. A saying you heard from
-      your grandmother does. The person who gets it feels seen — that is the
-      actual product.
-    </p>
-  </section>
-
-  <!-- Real pieces above the fold-ish, rather than three screens down. -->
-  <section class="sec pieces">
-    <div class="pieces__head">
-      <div data-r>
-        <p class="eyebrow">Selected</p>
-        <h2 class="h2">The pieces</h2>
+  <!-- Hover swaps front for back. These are back prints, so the back is
+       the side worth showing. -->
+  <section class="sec sec--line">
+    <div class="sec__head">
+      <div>
+        <div class="sec__n" data-r><b>02</b><span class="t-micro dim">Selected</span></div>
+        <h2 class="t-head" data-split>The pieces</h2>
+        <p class="t-micro dim grid__hint" data-r>Shown back first &mdash; hover to turn it round</p>
       </div>
-      <a class="btn-ghost" href="../store.html">See all 69</a>
+      <a class="btn btn--ghost" href="../store.html">See all 69</a>
     </div>
 
-    <div class="grid">
+    <div class="grid" id="grid">
       <a class="card" href="../store.html" data-r>
         <div class="card__shot">
-          <img class="base" src="../mockup/black back.webp" alt="" loading="lazy">
-          <img class="art" src="../products/7-001/7-001.webp" alt="7shm, back print on black" loading="lazy">
+          <div class="card__face card__face--front">
+            <img class="base" src="../mockup/black front.webp" alt="" loading="lazy">
+          </div>
+          <div class="card__face card__face--back">
+            <img class="base" src="../mockup/black back.webp" alt="" loading="lazy">
+            <img class="art" src="../products/7-001/7-001.webp" alt="7shm back print">
+          </div>
         </div>
-        <p class="card__name">7shm</p>
-        <p class="card__price">12 JOD</p>
+        <div class="card__meta"><span class="card__name">7shm</span><span class="card__price">12 JOD</span></div>
       </a>
 
       <a class="card" href="../store.html?category=special" data-r>
         <div class="card__shot">
-          <img class="base" src="../mockup/black back.webp" alt="" loading="lazy">
-          <img class="art" src="../products/R-001/R-001.webp" alt="Red LD, back print on black" loading="lazy">
+          <div class="card__face card__face--front">
+            <img class="base" src="../mockup/black front.webp" alt="" loading="lazy">
+          </div>
+          <div class="card__face card__face--back">
+            <img class="base" src="../mockup/black back.webp" alt="" loading="lazy">
+            <img class="art" src="../products/R-001/R-001.webp" alt="Red LD back print">
+          </div>
         </div>
-        <p class="card__name">Red LD</p>
-        <p class="card__price">12 JOD</p>
+        <div class="card__meta"><span class="card__name">Red LD</span><span class="card__price">12 JOD</span></div>
       </a>
 
       <a class="card" href="../store.html?category=pride" data-r>
         <div class="card__shot">
-          <img class="base" src="../mockup/white back.webp" alt="" loading="lazy">
-          <img class="art" src="../products/jo-004/jo-004.webp" alt="Amman, back print on white" loading="lazy">
+          <div class="card__face card__face--front">
+            <img class="base" src="../mockup/white front.webp" alt="" loading="lazy">
+          </div>
+          <div class="card__face card__face--back">
+            <img class="base" src="../mockup/white back.webp" alt="" loading="lazy">
+            <img class="art" src="../products/jo-004/jo-004.webp" alt="Amman back print">
+          </div>
         </div>
-        <p class="card__name">Amman</p>
-        <p class="card__price">12 JOD</p>
+        <div class="card__meta"><span class="card__name">Amman</span><span class="card__price">12 JOD</span></div>
       </a>
 
       <a class="card" href="../store.html?category=anime" data-r>
         <div class="card__shot">
-          <img class="base" src="../mockup/white back.webp" alt="" loading="lazy">
-          <img class="art" src="../products/ani-002/ani-002.webp" alt="Luffy Gear 5, back print on white" loading="lazy">
+          <div class="card__face card__face--front">
+            <img class="base" src="../mockup/white front.webp" alt="" loading="lazy">
+          </div>
+          <div class="card__face card__face--back">
+            <img class="base" src="../mockup/white back.webp" alt="" loading="lazy">
+            <img class="art" src="../products/ani-002/ani-002.webp" alt="Luffy Gear 5 back print">
+          </div>
         </div>
-        <p class="card__name">Luffy Gear 5</p>
-        <p class="card__price">12 JOD</p>
+        <div class="card__meta"><span class="card__name">Luffy Gear 5</span><span class="card__price">12 JOD</span></div>
       </a>
     </div>
   </section>
 
-  <!-- The four pillars and the two lines, grouped the way the store's own
-       filter bar groups them. -->
-  <section class="sec themes">
-    <div data-r>
-      <p class="eyebrow">Browse</p>
-      <h2 class="h2">By theme</h2>
+  <!-- Editorial split, using the lifestyle photography rather than more
+       cutouts. Image wipes up on entry. -->
+  <section class="sec sec--line">
+    <div class="split">
+      <div class="split__media wipe" data-wipe>
+        <img src="../images/team-01.webp" alt="An Ember tee worn on a stairwell in Amman" loading="lazy">
+      </div>
+      <div>
+        <div class="sec__n" data-r><b>03</b><span class="t-micro dim">The filter</span></div>
+        <h2 class="t-head" data-split>No souvenirs</h2>
+        <p class="t-body muted" data-r style="margin-top:var(--s5); max-width:46ch">
+          Every design has to fail one test before it gets made: could a visitor
+          in a souvenir shop read it? If yes, it is heritage as decoration and it
+          dies there. What is left only lands for someone who grew up here.
+        </p>
+        <p style="margin-top:var(--s6)"><a class="btn btn--ghost" href="../store.html?category=pride">See the Pride line</a></p>
+      </div>
     </div>
-    <div class="themes__grid" data-r>
+  </section>
+
+  <section class="sec sec--line">
+    <div class="split split--flip">
+      <div class="split__media wipe" data-wipe>
+        <img src="../images/team-03.webp" alt="Ember worn at night in Amman" loading="lazy">
+      </div>
+      <div>
+        <div class="sec__n" data-r><b>04</b><span class="t-micro dim">What is next</span></div>
+        <h2 class="t-head" data-split>The shirt is a start</h2>
+        <p class="t-body muted" data-r style="margin-top:var(--s5); max-width:46ch">
+          Today we print our own designs on good blanks. Next is the garment
+          itself — our patterns, our cloth, pieces cut to our spec. Identity does
+          not stop at a print on a chest.
+        </p>
+        <p style="margin-top:var(--s6)"><a class="btn btn--ghost" href="../partners.html">Read more</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec sec--line">
+    <div class="sec__n" data-r><b>05</b><span class="t-micro dim">Browse</span></div>
+    <h2 class="t-head" data-split style="margin-bottom:var(--s8)">By theme</h2>
+    <div class="tiles" data-r>
       <a class="tile" href="../store.html?category=special">
-        <span class="tile__n">01</span>
+        <span class="t-micro dim">01</span>
         <span class="tile__name">Special</span>
         <span class="tile__note">The ones that do not fit a box.</span>
       </a>
       <a class="tile" href="../store.html?category=anime">
-        <span class="tile__n">02</span>
+        <span class="t-micro dim">02</span>
         <span class="tile__name">Anime</span>
         <span class="tile__note">Shirts and pieces, one subject.</span>
       </a>
       <a class="tile" href="../store.html?category=pride">
-        <span class="tile__n">03</span>
+        <span class="t-micro dim">03</span>
         <span class="tile__name">Pride</span>
         <span class="tile__note">Jordan, without the souvenir shop.</span>
       </a>
       <a class="tile" href="../store.html?category=gym">
-        <span class="tile__n">04</span>
+        <span class="t-micro dim">04</span>
         <span class="tile__name">Gym</span>
         <span class="tile__note">A cut, not a theme.</span>
       </a>
     </div>
   </section>
 
-  <section class="sec offer" data-r>
-    <div class="offer__row">
-      <span class="offer__n">16%</span>
-      <span class="offer__t">off three pieces or more</span>
-      <span class="offer__sep" aria-hidden="true"></span>
-      <span class="offer__n">16 JOD</span>
-      <span class="offer__t">any shirt with any accessory</span>
+  <section class="offer">
+    <div class="sec" style="padding-block: clamp(40px,6vw,72px)">
+      <div class="offer__row">
+        <span class="offer__item"><b class="offer__n">16%</b><span class="offer__t">off three pieces or more</span></span>
+        <span class="offer__sep" aria-hidden="true"></span>
+        <span class="offer__item"><b class="offer__n">16 JOD</b><span class="offer__t">any shirt with any accessory</span></span>
+      </div>
     </div>
   </section>
 
-  <section class="sec" data-r>
-    <p class="eyebrow">Wholesale</p>
-    <h2 class="h2">Order in bulk</h2>
-    <p class="lede">
+  <section class="sec">
+    <div class="sec__n" data-r><b>06</b><span class="t-micro dim">Wholesale</span></div>
+    <h2 class="t-head" data-split>Order in bulk</h2>
+    <p class="t-body muted" data-r style="margin-top:var(--s5); max-width:52ch">
       Uniforms, team kits, event merch and staff wear. Tell us what you need and
       we come back with a quote. Shops can carry a stand with nothing paid up front.
     </p>
-    <p style="display:flex; gap:12px; flex-wrap:wrap; margin-top:26px">
-      <a class="btn-solid" href="../index.html#wholesale">Request a quote</a>
-      <a class="btn-ghost" href="../partners.html">Retail partners</a>
+    <p style="margin-top:var(--s6); display:flex; gap:var(--s3); flex-wrap:wrap">
+      <a class="btn btn--solid" href="../index.html#wholesale">Request a quote</a>
+      <a class="btn btn--ghost" href="../partners.html">Retail partners</a>
     </p>
   </section>
 
@@ -203,8 +260,7 @@
 <footer class="foot">
   <div class="foot__top">
     <a class="bar__mark" href="#main" aria-label="Ember, home">
-      <img src="../images/Artboard-12_1.svg" alt="" width="22" height="36">
-      <span>Ember</span>
+      <img src="../images/Artboard-12_1.svg" alt="" width="22" height="36"><span>Ember</span>
     </a>
     <div class="foot__links">
       <a href="../store.html">Store</a>
@@ -216,8 +272,8 @@
     </div>
   </div>
   <div class="foot__fine">
-    <span>&copy; 2026 Ember Clothing &amp; Uniform</span>
-    <span>Amman, Jordan</span>
+    <span class="t-micro dim">&copy; 2026 Ember Clothing &amp; Uniform</span>
+    <span class="t-micro dim">Amman, Jordan</span>
   </div>
 </footer>
 
@@ -225,40 +281,146 @@
 (function () {
   "use strict";
 
-  var sheet = document.getElementById("sheet");
-  var open  = document.getElementById("menu-open");
-  var close = document.getElementById("menu-close");
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* --- menu ---------------------------------------------------------- */
+  var sheet = document.getElementById("sheet"),
+      mOpen = document.getElementById("menu-open"),
+      mClose = document.getElementById("menu-close");
 
   function setMenu(on) {
     sheet.classList.toggle("is-open", on);
     sheet.setAttribute("aria-hidden", on ? "false" : "true");
-    open.setAttribute("aria-expanded", on ? "true" : "false");
+    mOpen.setAttribute("aria-expanded", on ? "true" : "false");
     document.body.style.overflow = on ? "hidden" : "";
-    (on ? close : open).focus();
+    (on ? mClose : mOpen).focus();
   }
-
-  open.addEventListener("click", function () { setMenu(true); });
-  close.addEventListener("click", function () { setMenu(false); });
-  sheet.addEventListener("click", function (e) {
-    if (e.target.closest(".sheet__link")) setMenu(false);
-  });
+  mOpen.addEventListener("click", function () { setMenu(true); });
+  mClose.addEventListener("click", function () { setMenu(false); });
+  sheet.addEventListener("click", function (e) { if (e.target.closest(".sheet__link")) setMenu(false); });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && sheet.classList.contains("is-open")) setMenu(false);
   });
 
-  // Reveal on scroll. Anything already in view on load is shown without
-  // animating, so the hero never fades in underneath the reader.
-  var items = document.querySelectorAll("[data-r]");
-  if (!("IntersectionObserver" in window)) {
-    items.forEach(function (el) { el.classList.add("in"); });
-    return;
-  }
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (en) {
-      if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+  /* --- split headlines into words -------------------------------------
+     Each word gets a clipping wrapper so it can rise from behind its own
+     edge, staggered by index. Markup is built here rather than written by
+     hand so the copy stays readable and editable.
+
+     This walks text nodes instead of slicing innerHTML on whitespace. The
+     string version tore inline <em> in half - browsers happened to repair
+     it, but the accent span ended up outside the element it was meant to
+     colour. Walking the tree leaves every element intact and simply
+     replaces the words inside it. */
+  function splitWords(root) {
+    var n = 0, texts = [];
+    var walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    while (walk.nextNode()) texts.push(walk.currentNode);
+
+    texts.forEach(function (node) {
+      if (!node.nodeValue.trim()) return;
+      var frag = document.createDocumentFragment();
+      node.nodeValue.split(/(\s+)/).forEach(function (chunk) {
+        if (!chunk) return;
+        if (!chunk.trim()) { frag.appendChild(document.createTextNode(" ")); return; }
+        var wrap = document.createElement("span");
+        wrap.className = "r-word";
+        var inner = document.createElement("i");
+        inner.textContent = chunk;
+        inner.style.transitionDelay = (n++ * 45) + "ms";
+        wrap.appendChild(inner);
+        frag.appendChild(wrap);
+      });
+      node.parentNode.replaceChild(frag, node);
     });
-  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
-  items.forEach(function (el) { io.observe(el); });
+  }
+  document.querySelectorAll("[data-split]").forEach(splitWords);
+
+  /* --- reveal on scroll ----------------------------------------------- */
+  var targets = document.querySelectorAll("[data-r], [data-split], [data-wipe]");
+  if (!("IntersectionObserver" in window) || reduced) {
+    targets.forEach(function (el) { el.classList.add("in"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add("in");
+        io.unobserve(en.target);
+      });
+      // threshold 0, not a fraction. A fraction starves tall elements: the
+      // 440px split photographs needed 8% of their height inside a root that
+      // the bottom margin had already shrunk, which never happened on a fast
+      // scroll, and they stayed wiped shut for the whole page.
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0 });
+    targets.forEach(function (el) { io.observe(el); });
+  }
+
+  /* --- hero: scale the photograph as it leaves ------------------------
+     The pinned panel holds while the image drifts, which is the Aevion
+     scroll feel. rAF-throttled so it does not fight the scroller. */
+  var heroImg = document.getElementById("hero-img");
+  var bar = document.getElementById("bar");
+  var lastY = 0, ticking = false;
+
+  function onFrame() {
+    ticking = false;
+    var y = window.pageYOffset;
+
+    if (heroImg && !reduced) {
+      var h = window.innerHeight || 1;
+      var p = Math.min(1, y / h);
+      heroImg.style.transform = "scale(" + (1.06 + p * 0.1).toFixed(4) + ") translateY(" + (p * 24).toFixed(2) + "px)";
+    }
+
+    // Hide the bar going down, bring it back coming up.
+    if (y > 240 && y > lastY) bar.classList.add("is-hidden");
+    else bar.classList.remove("is-hidden");
+    lastY = y;
+  }
+  window.addEventListener("scroll", function () {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(onFrame);
+  }, { passive: true });
+
+  /* --- marquee: duplicate the track so the loop is seamless ----------- */
+  var mq = document.getElementById("marquee");
+  if (mq) mq.innerHTML += mq.innerHTML;
+
+  /* --- cursor ---------------------------------------------------------
+     Desktop only; the CSS keeps it invisible on touch. */
+  var fine = window.matchMedia("(hover: hover) and (pointer: fine)");
+  if (fine.matches && !reduced) {
+    var dot = document.querySelector(".cursor"), ring = document.querySelector(".cursor-ring");
+    var rx = 0, ry = 0, tx = 0, ty = 0, live = false;
+
+    document.addEventListener("mousemove", function (e) {
+      tx = e.clientX; ty = e.clientY;
+      dot.style.transform = "translate(" + tx + "px," + ty + "px)";
+      // Both stay hidden until the pointer has actually moved, or they sit
+      // parked in the top-left corner on every fresh load.
+      if (!live) {
+        live = true;
+        rx = tx; ry = ty;
+        ring.style.transform = "translate(" + rx + "px," + ry + "px)";
+        dot.classList.add("is-live");
+        ring.classList.add("is-live");
+      }
+    }, { passive: true });
+
+    (function loop() {
+      // The ring trails the dot, which is what makes it feel physical.
+      rx += (tx - rx) * 0.18;
+      ry += (ty - ry) * 0.18;
+      ring.style.transform = "translate(" + rx + "px," + ry + "px)";
+      requestAnimationFrame(loop);
+    })();
+
+    document.querySelectorAll("a, button").forEach(function (el) {
+      el.addEventListener("mouseenter", function () { ring.classList.add("is-big"); });
+      el.addEventListener("mouseleave", function () { ring.classList.remove("is-big"); });
+    });
+  }
 })();
 </script>
 
